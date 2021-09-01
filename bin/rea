@@ -2,10 +2,10 @@
 use RakuExamAutomation;
 
 sub MAIN($command, $filename) {
-    if ($command == "create") {
+    if ($command eq "create") {
     
     }
     else {
-        # TODO Help menu.
+        say "Invalid Command \"$command\", try any of these:\n\t- create"
     }
 }
