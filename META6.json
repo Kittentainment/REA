@@ -8,7 +8,9 @@
   ],
   "auth": "Write me!",
   "depends": [
-    "Grammar::Debugger"
+    "Grammar::Debugger",
+    "Data::Dump::Tree",
+    "Data::Dump"
   ],
   "build-depends": [],
   "test-depends": [],

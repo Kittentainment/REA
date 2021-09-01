@@ -25,5 +25,23 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Data::Dump::Tree" type="perl6">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://-174008752:Data::Dump::Tree!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Data::Dump" type="perl6">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://-174008752:Data::Dump!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
