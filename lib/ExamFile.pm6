@@ -9,17 +9,37 @@ grammar ExamFile {
     }
     
     regex separator {
-        [^^ \h* '_'+ \h* $$ \n]+? # Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
+        [^^ \h* '_'+ \h* $$ \n]+?
+        # Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
     }
     
     regex intro {
-        ^
-        <singleLineExceptSeparator>+
-        #^ [<-[\n]>*\n]*?  $$ #Test the characters in a line greedily, but test the lines non greedily.
+        ^<singleLineExceptSeparator>+
     }
     
-    regex QACombo {
-        ^^<singleLineExceptSeparator>+
+    token QACombo {
+        \s*
+        <question>
+        \s*
+        <answers>
+        \s*
+        #        ^^<singleLineExceptSeparator>+
+    }
+    
+    regex question {
+        [<!before [<answer>]><singleLineExceptSeparator>]+
+    }
+    
+    regex answers {
+        [<answer>\s*]+
+    }
+    
+    regex answer {
+        \h* '[' \s*<marker>?<-[\]]>* ']' \N*
+    }
+    
+    regex marker {
+        \S
     }
     
     regex endOfExam {
@@ -27,11 +47,11 @@ grammar ExamFile {
         '=' ** 2..*
         \s*END\h*OF\h*EXAM\s*
         '=' ** 2..*
-        $
+        $$
     }
     
     regex singleLineExceptSeparator {
-        ^^<!before [<separator>]><!before [<endOfExam>]> \N* \n
+        <!before [<separator>]><!before [<endOfExam>]> \N* \n
     }
     
 }
@@ -43,8 +63,7 @@ ____
 1. question
 answer_1
 answer 2
-____
-____
+________
 2. question
 answer
 =======
