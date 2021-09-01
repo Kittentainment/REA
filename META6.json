@@ -7,7 +7,9 @@
     "Write me!"
   ],
   "auth": "Write me!",
-  "depends": [],
+  "depends": [
+    "Grammar::Debugger"
+  ],
   "build-depends": [],
   "test-depends": [],
   "provides": {

@@ -7,5 +7,23 @@
       <sourceFolder url="file://$MODULE_DIR$/t" isTestSource="true" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Terminal::ANSIColor" type="perl6">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://-174008752:Terminal::ANSIColor!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Grammar::Debugger" type="perl6">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://-174008752:Grammar::Debugger!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
