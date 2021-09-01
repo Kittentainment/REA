@@ -1,9 +1,14 @@
 #!/usr/bin/env perl6
-use RakuExamAutomation;
+use ExamFile;
 
 sub MAIN($command, $filename) {
     if ($command eq "create") {
-    
+        if ($filename.IO.e && $filename.IO.r) {
+            my $examMasterfileContent = $filename.IO.slurp;
+            
+        } else {
+            die "File doesn't exist"; # TODO better file error handling
+        }
     }
     else {
         say "Invalid Command \"$command\", try any of these:\n\t- create"
