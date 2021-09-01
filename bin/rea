@@ -1,0 +1,11 @@
+#!/usr/bin/env perl6
+use RakuExamAutomation;
+
+sub MAIN($command, $filename) {
+    if ($command == "create") {
+    
+    }
+    else {
+        # TODO Help menu.
+    }
+}
