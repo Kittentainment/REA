@@ -15,7 +15,9 @@
   "build-depends": [],
   "test-depends": [],
   "provides": {},
-  "resources": [],
+  "resources": [
+    "generated_exams/testresult.txt"
+  ],
   "license": "Write me!",
   "source-url": "Write me!"
 }

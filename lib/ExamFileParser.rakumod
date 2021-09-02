@@ -2,14 +2,24 @@ unit module ExamFileParser;
 
 use ExamFileGrammar;
 
-
+#|{
+Holds a Question with all its answers.
+Stores the answers separately, whether they were marked or not.
+}
 class QACombo is export {
     has Str $.question is required;
     has Str @.markedAnswers is required;
     has Str @.unmarkedAnswers is required;
+    
+    submethod getAllAnswerTexts() {
+        return (@!markedAnswers, @!unmarkedAnswers).flat;
+    }
 }
 
+#|{
+Parses the given exam file and splits it into its different components.
 
+}
 class EFParser is export {
     has Str $.fileName is required;
     has Str $.intro;
