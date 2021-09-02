@@ -4,9 +4,10 @@ use ExamFileParser;
 sub MAIN($command, $fileName) {
     if ($command eq "create") {
         
-        my $masterExam = EFParser.new(:$fileName);
+        my EFParser $masterExam = EFParser.new(:$fileName);
         
         say $masterExam.QACombos[0].markedAnswers[0];
+        say $masterExam.intro;
         
     }
     
