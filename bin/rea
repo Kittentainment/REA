@@ -1,15 +1,15 @@
-#!/usr/bin/env perl6
-use ExamFile;
+#!/usr/bin/env raku
+use ExamFileParser;
 
-sub MAIN($command, $filename) {
+sub MAIN($command, $fileName) {
     if ($command eq "create") {
-        if ($filename.IO.e && $filename.IO.r) {
-            my $examMasterfileContent = $filename.IO.slurp;
-            
-        } else {
-            die "File doesn't exist"; # TODO better file error handling
-        }
+        
+        my $masterExam = EFParser.new(:$fileName);
+        
+        say $masterExam.QACombos[0].markedAnswers[0];
+        
     }
+    
     else {
         say "Invalid Command \"$command\", try any of these:\n\t- create"
     }
