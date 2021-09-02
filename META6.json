@@ -15,7 +15,8 @@
   "build-depends": [],
   "test-depends": [],
   "provides": {
-    "ExamFile": "lib/ExamFile.pm6",
+    "ExamFileGrammar": "lib/ExamFileGrammar.pm6",
+    "ExamFileParser": "lib/ExamFileParser.pm6",
     "RakuExamAutomation": "lib/RakuExamAutomation.pm6"
   },
   "resources": [],

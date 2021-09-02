@@ -1,6 +1,6 @@
 #use Grammar::Debugger;
 
-grammar ExamFile {
+grammar ExamFileGrammar {
     regex TOP {
         <intro>
         [<separator> <QACombo>]+
@@ -34,7 +34,11 @@ grammar ExamFile {
     }
     
     regex answer {
-        \h* '[' \s*<marker>?<-[\]]>* ']' \N*
+        \h* '[' \s*<marker>?<-[\]]>* ']' \h* <answerText>
+    }
+    
+    regex answerText {
+        \N+
     }
     
     regex marker {
@@ -56,7 +60,7 @@ grammar ExamFile {
 }
 
 
-my $parsed = ExamFile.parse(
+my $parsed = ExamFileGrammar.parse(
 "Complete this exam by placing an 'X' in the box beside each correct
 answer, like so:
 
@@ -109,4 +113,5 @@ ________________________________________________________________________________
 "
         );
 
-say $parsed{"QACombo"}[0]{"answers"}{"answer"}[0]{"marker"}
+#say $parsed{"QACombo"}[0]{"answers"}{"answer"}[0]{"marker"};
+say $parsed{"QACombo"}[0]{"question"}.Str.trim-trailing;
