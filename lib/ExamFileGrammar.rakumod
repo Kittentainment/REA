@@ -1,20 +1,22 @@
-#use Grammar::Debugger;
+use Grammar::Debugger;
 
 grammar ExamFileGrammar {
     regex TOP {
         <intro>
-        [<separator><QACombo>]+
+        [<separator> <QACombo>]+
         <separator>?
+        \s*
         [<endOfExam> <comments>?]?
-#        .*                      # unsure if smart. idea: eat everything it cannot match (gibberish)
+#                .*                      # unsure if smart. idea: eat everything it cannot match (gibberish)
     }
     
     regex separator {
-#        [^^ \h* '_'+ \h* $$ \n?]+? # Does not allow for whitespace between the _
-        [^^ <[\h_]>* '_' <[\h_n]>* $$ \n?]+?   # Line(s) consisting of only horizontal whitespace and underscores, with at leas one underscore
+        #        [^^ \h* '_'+ \h* $$ \n?]+? # Does not allow for whitespace between the _
+        [^^ <[\h_]>* '_' <[\h_]>* $$ \n?]+?
+        # Line(s) consisting of only horizontal whitespace and underscores, with at leas one underscore
         # Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
     }
-
+    
     
     regex intro {
         ^<singleLineExceptSeparator>+
@@ -25,15 +27,16 @@ grammar ExamFileGrammar {
         <question>?
         \s*
         <answers>
-        \s* # Not actually necessary, as they are already all in the answers, but just for safety
+        \s*
+        # Not actually necessary, as they are already all in the answers, but just for safety
     }
     
-    regex question {
+    token question {
         [<!before [<answer>]><singleLineExceptSeparator>]+
     }
     
     regex answers {
-        [<answer>\s*]+
+        [<answer>\n]+
     }
     
     regex answer {
@@ -51,20 +54,21 @@ grammar ExamFileGrammar {
     regex endOfExam {
         ^^
         <lineOfEquals>
-        [<!before [<lineOfEquals>]>\N*\n]+?
+        [\N*\n]
         <lineOfEquals>
         $$
     }
-
-    regex  lineOfEquals {
-        ^^[<[=\h]>* '=' \h* '=' <[=\h]>]$$ \n
+    
+    regex lineOfEquals {
+        ^^[\h* '=' \h*] ** 1..* $$\n?
+        #^^[<[=\h]>* '=' \h* '=' <[=\h]>]$$ \n
     }
-
+    
     regex comments {
         \s*
         <comment>?
         \s*
-        [<separator> \s* <comment> \s*  ]*
+        [<separator> \s* <comment> \s*]*
         \s*
         <separator>?
         \s*
