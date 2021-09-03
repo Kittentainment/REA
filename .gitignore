@@ -2,7 +2,7 @@
 
 # All the generated resources.
 resources/generated_exams
-
+*.iml
 
 
 
