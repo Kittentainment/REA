@@ -1,4 +1,4 @@
-use Grammar::Debugger;
+#use Grammar::Debugger;
 
 grammar ExamFileGrammar {
     regex TOP {
@@ -6,11 +6,12 @@ grammar ExamFileGrammar {
         [<separator><QACombo>]+
         <separator>?
         [<endOfExam> <comments>?]?
+#        .*                      # unsure if smart. idea: eat everything it cannot match (gibberish)
     }
     
     regex separator {
-#        [^^ \h* '_'+ \h* $$ \n]+? # Does not allow for whitespace between the _
-        [^^ <[\h_]>* '_' <[\h_]>* $$]+?   # Line(s) consisting of only horizontal whitespace and underscores, with at leas one underscore
+#        [^^ \h* '_'+ \h* $$ \n?]+? # Does not allow for whitespace between the _
+        [^^ <[\h_]>* '_' <[\h_n]>* $$ \n?]+?   # Line(s) consisting of only horizontal whitespace and underscores, with at leas one underscore
         # Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
     }
 
@@ -50,20 +51,23 @@ grammar ExamFileGrammar {
     regex endOfExam {
         ^^
         <lineOfEquals>
-        \n
-        [\N*\n]+?
+        [<!before [<lineOfEquals>]>\N*\n]+?
         <lineOfEquals>
         $$
     }
 
-    regex lineOfEquals{
-        <[=\h]>* '=' \h* '=' <[=\h]>*
+    regex  lineOfEquals {
+        ^^[<[=\h]>* '=' \h* '=' <[=\h]>]$$ \n
     }
 
     regex comments {
         \s*
-        [<comment> \s* <separator> \s*]*
+        <comment>?
+        \s*
+        [<separator> \s* <comment> \s*  ]*
+        \s*
         <separator>?
+        \s*
     }
     regex comment {
         [<singleLineExceptSeparator>]*
