@@ -1,11 +1,11 @@
-#use Grammar::Debugger;
+use Grammar::Debugger;
 
 grammar ExamFileGrammar {
     regex TOP {
         <intro>
         [<separator> <QACombo>]+
         <separator>?
-        <endOfExam>?
+        [<endOfExam> <comments>?]?
     }
     
     regex separator {
@@ -50,7 +50,11 @@ grammar ExamFileGrammar {
         '=' ** 2..*
         \s*END\h*OF\h*EXAM\s*
         '=' ** 2..*
-        $$
+        $$ \n*
+    }
+    
+    token comments {
+        .*
     }
     
     regex singleLineExceptSeparator {
