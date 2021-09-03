@@ -2,7 +2,8 @@
 
 # All the generated resources.
 resources/generated_exams
-
+RakuExamAutomation.iml
+.idea/misc.xml
 
 
 
