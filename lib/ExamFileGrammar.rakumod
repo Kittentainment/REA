@@ -1,17 +1,19 @@
-#use Grammar::Debugger;
+use Grammar::Debugger;
 
 grammar ExamFileGrammar {
     regex TOP {
         <intro>
-        [<separator> <QACombo>]+
+        [<separator><QACombo>]+
         <separator>?
-        <endOfExam>?
+        [<endOfExam> <comments>?]?
     }
     
     regex separator {
-        [^^ \h* '_'+ \h* $$ \n]+?
+#        [^^ \h* '_'+ \h* $$ \n]+? # Does not allow for whitespace between the _
+        [^^ <[\h_]>* '_' <[\h_]>* $$]+?   # Line(s) consisting of only horizontal whitespace and underscores, with at leas one underscore
         # Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
     }
+
     
     regex intro {
         ^<singleLineExceptSeparator>+
@@ -44,13 +46,27 @@ grammar ExamFileGrammar {
     regex marker {
         <-[\s\]]>
     }
-    
+    #| the "End Of Exam" Marker consists of two lines of 2 or more ='s with any text inside
     regex endOfExam {
         ^^
-        '=' ** 2..*
-        \s*END\h*OF\h*EXAM\s*
-        '=' ** 2..*
+        <lineOfEquals>
+        \n
+        [\N*\n]+?
+        <lineOfEquals>
         $$
+    }
+
+    regex lineOfEquals{
+        <[=\h]>* '=' \h* '=' <[=\h]>*
+    }
+
+    regex comments {
+        \s*
+        [<comment> \s* <separator> \s*]*
+        <separator>?
+    }
+    regex comment {
+        [<singleLineExceptSeparator>]*
     }
     
     regex singleLineExceptSeparator {
