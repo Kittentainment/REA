@@ -15,9 +15,7 @@
   ],
   "build-depends": [],
   "test-depends": [],
-  "provides": {
-    "gui": "lib/gui.pm6"
-  },
+  "provides": {},
   "resources": [],
   "license": "Write me!",
   "source-url": "Write me!"

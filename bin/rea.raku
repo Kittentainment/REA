@@ -2,21 +2,25 @@
 use ExamFileParser;
 use MasterFileConverter;
 
-sub MAIN($command, $fileName) {
+sub MAIN($command, $masterFileName) {
     if ($command eq "create") {
-        
-        
-        createTestsFromMasterFile(masterFileName => $fileName, count => 1);
-
-#
-#        my EFParser $masterExam = EFParser.new(:$fileName);
-#
-#        say $masterExam.QACombos[0].markedAnswers[0];
-#        say $masterExam.intro;
-        
+        createTestsFromMasterFile(:$masterFileName, count => 1);
+    }
+    elsif($command eq "evaluate") {
+        # TODO
+    }
+    elsif ($command ~~ /'-'h|help/) {
+        showHelp();
     }
     
     else {
-        say "Invalid Command \"$command\", try any of these:\n\t- create"
+        say "Invalid Command \"$command\".\n";
+        showHelp();
     }
+}
+
+sub showHelp() {
+    say "rea works with the following commands
+\t- create <path/to/masterfile>
+\t\tParse a master file and create exams for it. #TODO: Explain how to create a master file.";
 }
