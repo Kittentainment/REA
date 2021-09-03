@@ -10,13 +10,19 @@
   "depends": [
     "Grammar::Debugger",
     "Data::Dump::Tree",
-    "Data::Dump"
+    "Data::Dump",
+    "GTK::Simple"
   ],
   "build-depends": [],
   "test-depends": [],
-  "provides": {},
+  "provides": {
+    "gui": "lib/gui.pm6"
+  },
   "resources": [
-    "generated_exams/testresult.txt"
+    "generated_exams/testresult.txt",
+    "generated_exams/202109-03-1224:27-FHNW_entrance_exam_master_file_2017.txt",
+    "generated_exams/20210903-1225:14-FHNW_entrance_exam_master_file_2017.txt",
+    "generated_exams/20210903-122525-FHNW_entrance_exam_master_file_2017.txt"
   ],
   "license": "Write me!",
   "source-url": "Write me!"

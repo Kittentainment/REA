@@ -12,12 +12,18 @@ my Str $outputDirName = "generated_exams";
 sub createTestsFromMasterFile (Str :$masterFileName, Int :$count = 1) is export {
     # TODO test count >= 1;
     
+    say "Parsing...";
+    
     my EFParser $masterExam = EFParser.new(fileName => $masterFileName);
     
+    say "Succesfully parsed $masterFileName";
+    
+    say "Creating $count Exam File{$count > 1 ?? "s" !! ""}...";
     for 1 .. $count {
         my Str $examText = convertToRandomExamString($masterExam);
         saveAsFile(:$examText, :$masterFileName)
     }
+    say "Succesfully created $count Exam File{$count > 1 ?? "s" !! ""} in folder $outputDirName.";
 }
 
 
@@ -49,7 +55,10 @@ sub saveAsFile(Str :$examText, Str :$masterFileName) {
         $outputDirPath.IO.mkdir;
     }
     my DateTime $currDate = DateTime.now;
-    my Str $newFileName = $outputDirPath ~ "/testresult.txt";
+    my Str $newFileName = $outputDirPath ~ "/";
+    $newFileName ~= $currDate.yyyy-mm-dd.subst('-', :g) ~ '-';
+    $newFileName ~= $currDate.hh-mm-ss.subst(':', :g) ~ '-';
+    $newFileName ~= $masterFileName.IO.basename;
     
     $newFileName.IO.spurt: $examText;
     
