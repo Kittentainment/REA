@@ -2,10 +2,7 @@ unit module MasterFileConverter;
 
 use ExamFileParser;
 
-my Str $endOfExamText =
-        "=" x 80 ~ "\n"
-                ~ " " x 34 ~ "END OF EXAM" ~ " " x 35 ~ "\n" ~
-                "=" x 80 ~ "\n";
+my Str $endOfExamMarker = "=" x 80 ~ "\n";
 
 my Str $outputDirName = "generated_exams";
 
@@ -43,7 +40,9 @@ sub convertToRandomExamString(EFParser $efParser) {
         $examText ~= "\n";
     }
     
-    $examText ~= $endOfExamText;
+    $examText ~= $endOfExamMarker;
+    $examText ~= $efParser.endOfExamText ~ "\n";
+    $examText ~= $endOfExamMarker;
     
     return $examText;
 }

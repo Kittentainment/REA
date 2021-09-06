@@ -9,17 +9,11 @@ grammar ExamFileGrammar {
         [<.endOfExam> <comments>?]?
     }
     
-    #| Line(s) consisting of only horizontal whitespace and underscores, with at least one underscore
+    #| Line(s) consisting of only horizontal whitespace and at least 10 equal characters, that are non-space and non-'='.
     #| Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
+    #| A separator can't be '=' characters, as they are used for the End of Exam marker.
     regex separator {
-        [^^[\h* '_' \h*] ** 1..* $$\n?]+
-        
-#        [^^ \h* '_'+ \h* $$ \n]+?
-#        # Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
-
-#        [^^ <[\h_]>*? '_' <[\h_]>*? $$ \n?]+
-#        # Line(s) consisting of only horizontal whitespace and underscores, with at least one underscore
-#        # Multiple lines of separator -> one separator (e.g. if someone hits enter inside a separator)
+        [^^[\h* (<-[\s=]>) \h*] {} [\h* $0 \h*] ** 9..* $$\n?]+
     }
     
     regex intro {
@@ -67,14 +61,14 @@ grammar ExamFileGrammar {
     regex endOfExam {
         ^^
         <.lineOfEquals>
-        [\N*\n]
+        [\N*\n]+?
         <.lineOfEquals>
         $$
         \s* # take all the space after End Of Exam, so comments are only registered, if there are any non-space characters.
     }
 
     regex lineOfEquals {
-        ^^[\h* '=' \h*] ** 1..* $$\n?
+        ^^[\h* '=' \h*] ** 4..* $$\n?
         #^^[<[=\h]>* '=' \h* '=' <[=\h]>]$$ \n
     }
     
