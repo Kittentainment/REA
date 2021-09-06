@@ -23,9 +23,14 @@ Parses the given exam file and splits it into its different components.
 class EFParser is export {
     has Str $.fileName is required;
     has Str $.intro;
+    has Str $.separator;
     has QACombo @.QACombos;
+    has Str $.endOfExamText;
     
-    submethod BUILD(:$!fileName, :$!separator = '_' x 80) {
+    submethod BUILD(
+            :$!fileName,
+            :$!separator = '_' x 80,
+            :$!endOfExamText = " " x 34 ~ "END OF EXAM" ~ " " x 35) {
         unless ($!fileName.IO.e && $!fileName.IO.r) {
             die "File doesn't exist";
             # TODO better file error handling
