@@ -35,6 +35,8 @@ class EFParser is export {
         my Str $fileContent = $!fileName.IO.slurp;
         my Match $parseTree = ExamFileGrammar.parse($fileContent);
         
+        say $parseTree;
+        
         # The structure of the parse tree (only the relevant info)
         # $parsed{"QACombo"}[0]{"answers"}{"answer"}[0]{"marker"}
         # $parsed{"QACombo"}[0]{"answers"}{"answer"}[0]{"answerText"}

@@ -6,18 +6,11 @@ ________________________________________________________________________________
 
 1. The name of this class is:
 
-    [X] Introduction to Perl for Programmers
-    [ ] Introduction to Perl for Programmers and Other Crazy People
+    [x] Introduction to Perl for Programmers
+    [x] Introduction to Perl for Programmers and Other Crazy People
 
 ________________________________________________________________________________
 
-
-2. The lecturer for this class is:
-
-    [X] Dr Damian Conway
-    [ ] Dr Who
-
-________________________________________________________________________________
 
 
 3. The correct way to answer each question is:
@@ -26,13 +19,13 @@ ________________________________________________________________________________
     [ ] To put an X in every box, except the one beside the correct answer
 
 ________________________________________________________________________________
-
 ====
 This is the EOE marker text
 =====
 
 
 This is a comment
+lkjlkjlkjl
 _________
 
 this is another comment

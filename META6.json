@@ -15,10 +15,13 @@
   ],
   "build-depends": [],
   "test-depends": [],
-  "provides": {
-    "gui": "lib/gui.pm6"
-  },
-  "resources": [],
+  "provides": {},
+  "resources": [
+    "generated_exams/20210903-200118-ver_short_file.txt",
+    "generated_exams/20210903-200229-ver_short_file.txt",
+    "very_short_file.txt",
+    "generated_exams/20210903-200626-very_short_file.txt"
+  ],
   "license": "Write me!",
   "source-url": "Write me!"
 }
