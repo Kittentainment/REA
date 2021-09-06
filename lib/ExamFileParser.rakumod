@@ -47,7 +47,7 @@ class EFParser is export {
         $!intro = $parseTree{"intro"}.Str;
         
         for $parseTree{"QACombo"} -> $qaComboParseTree {
-            my Str $question = $qaComboParseTree{"question"}.Str.trim-trailing;
+            my Str $question = ($qaComboParseTree{"question"}.Str.trim-trailing or "");
             my Match $answers = $qaComboParseTree{"answers"};
             my Str @markedAnswers;
             my Str @unmarkedAnswers;

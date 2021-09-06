@@ -4,15 +4,16 @@ use TestHelperMethods;
 
 subtest "Correctly differentiates between Exam Files and Non-ExamFiles" => {
     
-    lives-ok {
-        parseWholeDirectory("t/testResources/SampleResponses/")
-    };
+    subtest "Parse sample responses" => {
+        parseWholeDirectory(dirPath => "t/testResources/SampleResponses/", shouldPass => 1)
+    }
     
-    for glob("t/testResources/OwnFiles/ShouldNotParseFiles/*") -> $file {
-        if ($file.d) { next(); }
-        dies-ok {
-            parseFile(:$file);
-        }
+    subtest "Parse own correct files" => {
+        parseWholeDirectory(dirPath => "t/testResources/OwnFiles/ShouldParseWithoutErrorFiles/", shouldPass => 1);
+    }
+    
+    subtest "Fail to parse incorrect files" => {
+        parseWholeDirectory(dirPath => "t/testResources/OwnFiles/ShouldNotParseFiles/", shouldPass => 0);
     }
     
 }
