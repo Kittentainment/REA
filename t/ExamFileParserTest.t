@@ -8,7 +8,7 @@ sub checkParser(:$fileName, :$intro, :@questions, :@markedAnswersList, :@unmarke
     
     my $parsed = EFParser.new(:$fileName);
     
-    is $parsed.intro, $intro;
+    is $parsed.intro, $intro, "test intro";
     
     my QACombo @allQACombos;
     
@@ -19,7 +19,7 @@ sub checkParser(:$fileName, :$intro, :@questions, :@markedAnswersList, :@unmarke
         
         @allQACombos.append(QACombo.new(:$question, :@markedAnswers, :@unmarkedAnswers));
     }
-    is-deeply $parsed.QACombos, @allQACombos;
+    is-deeply $parsed.QACombos, @allQACombos, "test QACombo";
 }
 
 subtest 'simple exam files' => {
@@ -34,17 +34,6 @@ subtest 'simple exam files' => {
             unmarkedAnswersList => (("answer 1.2"),
                                     ("answer 2.2"))
                          );
-
-    checkParser(
-            fileName => "t/testResources/OwnFiles/ParserTestFiles/exam-00.txt",
-            intro => "This is the intro to the exam file 00\n",
-            questions => ("1. first question",
-                          "2. second question"),
-            markedAnswersList => (("answer 1.1"),
-                                  ("answer 2.1")),
-            unmarkedAnswersList => (("answer 1.2"),
-                                    ("answer 2.2"))
-                             );
     
     say "...simple files tests done.";
 }

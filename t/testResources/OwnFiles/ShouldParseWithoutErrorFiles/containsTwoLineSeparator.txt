@@ -1,0 +1,11 @@
+This is the intro to the exam file 00
+____________________
+1. first question
+    [x] answer 1.1
+    [ ] answer 1.2
+____________________
+____________________
+2. second question
+    [x] answer 2.1
+    [ ] answer 2.2
+____________________
