@@ -30,7 +30,7 @@ class EFParser is export {
     submethod BUILD(
             :$!fileName,
             :$!separator = '_' x 80,
-            :$!endOfExamText = " " x 34 ~ "END OF EXAM" ~ " " x 35) {
+            :$!endOfExamText = " " x 34 ~ "END OF EXAM") {
         unless ($!fileName.IO.e && $!fileName.IO.r) {
             die "File doesn't exist";
             # TODO better file error handling

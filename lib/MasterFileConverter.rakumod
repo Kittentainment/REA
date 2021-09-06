@@ -30,14 +30,14 @@ sub convertToRandomExamString(EFParser $efParser) {
     $examText ~= $efParser.intro;
     
     for $efParser.QACombos -> $qaCombo {
-        $examText ~= $efParser.separator ~ "\n\n\n";
+        $examText ~= $efParser.separator ~ "\n\n";
         
         $examText ~= $qaCombo.question ~ "\n\n";
         my Str @allAnswerTexts = $qaCombo.getAllAnswerTexts;
         for (@allAnswerTexts.pick(*)) -> $answerText {
             $examText ~= "\t[ ] $answerText\n";
         }
-        $examText ~= "\n";
+        $examText ~= "\n\n";
     }
     
     $examText ~= $endOfExamMarker;
