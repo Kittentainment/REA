@@ -23,7 +23,6 @@ Parses the given exam file and splits it into its different components.
 class EFParser is export {
     has Str $.fileName is required;
     has Str $.intro;
-    has Str $.separator;
     has QACombo @.QACombos;
     
     submethod BUILD(:$!fileName, :$!separator = '_' x 80) {
@@ -33,7 +32,7 @@ class EFParser is export {
         }
         
         my Str $fileContent = $!fileName.IO.slurp;
-        my Match $parseTree = ExamFileGrammar.parse($fileContent);
+        my Match $parseTree = ExamFileGrammar.parse($fileContent) or die "Parsing of file $!fileName failed!";
         
         # The structure of the parse tree (only the relevant info)
         # $parsed{"QACombo"}[0]{"answers"}{"answer"}[0]{"marker"}
