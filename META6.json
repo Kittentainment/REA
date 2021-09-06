@@ -11,7 +11,8 @@
     "Grammar::Debugger",
     "Data::Dump::Tree",
     "Data::Dump",
-    "GTK::Simple"
+    "GTK::Simple",
+    "IO::Glob"
   ],
   "build-depends": [],
   "test-depends": [],
