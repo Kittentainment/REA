@@ -3,10 +3,10 @@
 grammar ExamFileGrammar {
     regex TOP {
         <intro>
-        [<separator> <QACombo>]+
-        <separator>?
+        [<.separator> <QACombo>]+
+        <.separator>?
         \s* # For the end
-        [<endOfExam> <comments>?]?
+        [<.endOfExam> <comments>?]?
     }
     
     #| Line(s) consisting of only horizontal whitespace and underscores, with at least one underscore
@@ -23,7 +23,7 @@ grammar ExamFileGrammar {
     }
     
     regex intro {
-        ^<singleLineExceptSeparator>+
+        ^<.singleLineExceptSeparator>+
     }
     
     token QACombo {
@@ -35,7 +35,7 @@ grammar ExamFileGrammar {
     }
     
     regex question {
-        [<!before [<answer>]><singleLineExceptSeparator>]+
+        [<!before [<answer>]><.singleLineExceptSeparator>]+
     }
     
     regex answers {
@@ -66,9 +66,9 @@ grammar ExamFileGrammar {
     #| the "End Of Exam" Marker consists of two lines of 2 or more ='s with any text inside
     regex endOfExam {
         ^^
-        <lineOfEquals>
+        <.lineOfEquals>
         [\N*\n]
-        <lineOfEquals>
+        <.lineOfEquals>
         $$
         \s* # take all the space after End Of Exam, so comments are only registered, if there are any non-space characters.
     }
