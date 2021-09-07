@@ -16,7 +16,9 @@
   ],
   "build-depends": [],
   "test-depends": [],
-  "provides": {},
+  "provides": {
+    "evaluateFilledOutFiles": "lib/evaluateFilledOutFiles.pm6"
+  },
   "resources": [],
   "license": "Write me!",
   "source-url": "Write me!"
