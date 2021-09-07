@@ -26,6 +26,7 @@ class EFParser is export {
     has Str $.separator;
     has QACombo @.QACombos;
     has Str $.endOfExamText;
+    has Str $.Comments;
     
     submethod BUILD(
             :$!fileName,
@@ -47,13 +48,12 @@ class EFParser is export {
         $!intro = $parseTree{"intro"}.Str;
         
         for $parseTree{"QACombo"} -> $qaComboParseTree {
-            my Str $question = ($qaComboParseTree{"question"}.Str.trim-trailing or "");
+            my Str $question = ($qaComboParseTree{"question"}.?Str.trim-trailing // "");
             my Match $answers = $qaComboParseTree{"answers"};
             my Str @markedAnswers;
             my Str @unmarkedAnswers;
             for $answers{"answer"} -> $answer {
-                my Str $answerText = $answer{"answerText"}.Str;
-                #                    say $answerText;
+                my Str $answerText = ($answer{"answerText"}.?Str or "");
                 if $answer{"marker"} {
                     @markedAnswers.append($answerText);
                 } else {
@@ -62,6 +62,7 @@ class EFParser is export {
             }
             @!QACombos.append(QACombo.new(:$question, :@markedAnswers, :@unmarkedAnswers));
         }
+        $!Comments = ($parseTree{"comments"}.?Str // "") ;
     }
 }
 
