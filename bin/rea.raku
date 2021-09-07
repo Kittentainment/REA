@@ -1,7 +1,10 @@
 #!/usr/bin/env raku
 use ExamFileParser;
 use MasterFileConverter;
-
+#|{ REA (Raku Exam Automation) Takes two arguments:
+#| - which command shall be executed
+#| - the name of the MasterFile
+}
 sub MAIN($command, $masterFileName) {
     if ($command eq "create") {
         createTestsFromMasterFile(:$masterFileName, count => 1);
