@@ -1,7 +1,7 @@
 #!/usr/bin/env raku
 use ExamFileParser;
 use MasterFileConverter;
-use evaluateFilledOutFiles;
+use EvaluateFilledOutFiles;
 #|{ REA (Raku Exam Automation) Takes two arguments:
 #| - which command shall be executed
 #| - the name of the MasterFile

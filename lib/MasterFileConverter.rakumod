@@ -4,7 +4,7 @@ use ExamFileParser;
 
 my Str $endOfExamMarker = "=" x 80 ~ "\n";
 
-my Str $outputDirName = "generated_exams";
+my Str $OUTPUT_DIR_NAME = "generated_exams";
 
 sub createTestsFromMasterFile (Str :$masterFileName, Int :$count = 1) is export {
     # TODO test count >= 1;
@@ -20,7 +20,7 @@ sub createTestsFromMasterFile (Str :$masterFileName, Int :$count = 1) is export 
         my Str $examText = convertToRandomExamString($masterExam);
         saveAsFile(:$examText, :$masterFileName, iteration => $count > 1 ?? $i !! -1);
     }
-    say "Succesfully created $count Exam File{ $count > 1 ?? "s" !! "" } in folder $outputDirName.";
+    say "Succesfully created $count Exam File{ $count > 1 ?? "s" !! "" } in folder $OUTPUT_DIR_NAME.";
 }
 
 
@@ -53,7 +53,7 @@ If we process a batch of multiple files, the form is YYYYMMDD-HHMMSS-$iteration-
 original file. If only one file should be generated, don't set $iteration, or set it to a negative number.
 }
 sub saveAsFile(Str :$examText, Str :$masterFileName, :$iteration = -1) {
-    my Str $outputDirPath = $masterFileName.IO.dirname ~ "/" ~ $outputDirName;
+    my Str $outputDirPath = $masterFileName.IO.dirname ~ "/" ~ $OUTPUT_DIR_NAME;
     unless ($outputDirPath.IO.e) {
         $outputDirPath.IO.mkdir;
     }

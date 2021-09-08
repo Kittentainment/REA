@@ -20,7 +20,7 @@ sub checkParser(:$fileName, :$intro, :@questions, :@markedAnswersList, :@unmarke
         @allQACombos.append(QACombo.new(:$question, :@markedAnswers, :@unmarkedAnswers));
     }
     is-deeply $parsed.QACombos, @allQACombos, "Test QACombo";
-    is $parsed.Comments, $comments, "Test Comments"
+    is $parsed.comments, $comments, "Test Comments"
 }
 
 
