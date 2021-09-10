@@ -323,6 +323,7 @@ ________________________________________________________________________________
     [ ] 'raise'
     [ ] 'except'
     [ ] 'exit'
+    [ ] 'additionally added answer'
 
 ________________________________________________________________________________
 
@@ -330,10 +331,7 @@ ________________________________________________________________________________
 29. How are exceptions are caught and accessed in Perl?
 
     [X] Caught in an 'eval' block;  accessed via the special $@ variable
-    [ ] Caught in a 'try' block;    accessed via a 'catch' block
-    [ ] Caught in a 'do' block;     accessed via the builtin 'eval' function
-    [ ] Caught in a 'catch' block'; accessed via the special $! variable
-    [ ] Exceptions in Perl can't be caught or accessed after they're thrown
+
 
 ________________________________________________________________________________
 
@@ -344,6 +342,5 @@ ________________________________________________________________________________
     [ ] It converts all warnings to fatal errors
     [ ] It disallows package variables (all variables must be declared with 'my')
     [ ] It reports all errors using verbose (and harshly worded) error messages
-    [ ] It prevents any construct that might also be valid C code
 
 ________________________________________________________________________________
