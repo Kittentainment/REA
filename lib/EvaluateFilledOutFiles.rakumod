@@ -28,12 +28,11 @@ enum TestResultWarnings <
     INTRO_MISMATCH
     QUESTION_MISMATCH
     ANSWER_MISMATCH
-    ANSWER_MISSING
-    TOO_MANY_ANSWERS
 
-    COUNT_ERROR
+    QUESTION_COUNT_ERROR
     QUESTION_MISMATCH_ERROR
     ANSWER_MISMATCH_ERROR
+
 >;
 
 #| WarningInfo stores additional information on the Warning that occurred
@@ -45,12 +44,15 @@ class WarningInfo is export {
     has Str $.actualAnswerText;
     has Str $.expectedAnswerText;
     has Num $.mismatchSeverity;
-    has Str @.missingAnswersTexts;
-    #| returns true if the examiner needs to double check the result to ensure correct grading
+    has Str @.expectedAnswerTexts;
+    has Str @.actualAnswerTexts;
+
+    #| Returns true if the examiner needs to double check the result to ensure correct grading.
     method isSevere() returns Bool {
-        return True if  ($!warning == COUNT_ERROR ||
+        return True if  ($!warning == QUESTION_COUNT_ERROR ||
                 $!warning == QUESTION_MISMATCH_ERROR ||
-                $!warning == ANSWER_MISMATCH_ERROR);
+                $!warning == ANSWER_MISMATCH_ERROR ||
+                $!warning == ANSWER_MISSING_ERROR);
         return False;
     }
 }
@@ -68,7 +70,7 @@ class FailedTestResult is export is TestResult {
     has TestFailedReason $.reason is required;
 
     #| returns true if the evaluation finished without fatal errors
-    method isOK() returns Bool is export {
+    method isOK() returns Bool {
         return False;
     }
 }
@@ -79,12 +81,12 @@ class OkTestResult is export is TestResult {
     has Str $.comments;
 
     #| returns true if there are warnings about the evaluation
-    submethod hasWarnings() returns Bool is export {
+    submethod hasWarnings() returns Bool {
         return @!warnings.Bool;
     }
 
     #| returns true if the evaluation finished without fatal errors
-    method isOK() returns Bool is export {
+    method isOK() returns Bool{
         return True;
     }
 }
@@ -122,39 +124,73 @@ sub evaluateFilledOutFileExactly(:$parsedMasterFile, :$parsedFilledOutFile) retu
     my Str $fileName = $parsedFilledOutFile.fileName;
     my Str $comments = $parsedFilledOutFile.comments;
 
-    #check if intro is matching -> warning
+    # Warn if intro does not match exactly, as this could be a disadvantage to a student.
+    unless ($parsedMasterFile.intro eq $parsedFilledOutFile.intro) {
+        @warnings.append(WarningInfo.new(warning => INTRO_MISMATCH));
+    }
+
 
     for ^$parsedMasterFile.QACombos -> $i{
+        # If there is no question from the student file, some questions might have gone missing.
         unless ($parsedFilledOutFile.QACombo[$i]) {
-            @warnings.append(WarningInfo.new(warning => COUNT_ERROR, questionNumber => $i));
+            @warnings.append(WarningInfo.new(warning => QUESTION_COUNT_ERROR, questionNumber => $i));
             last;
         }
-        unless ($parsedMasterFile.QACombos[$i].question eq $parsedFilledOutFile.QACombo[$i].question) {
+
+        my $masterQACombo = $parsedMasterFile.QACombos[$i];
+        my $filledOutQACombo = $parsedFilledOutFile.QACombos[$i];
+
+        # If the questions don't match, we can't evaluate it, as we can't guarantee it's the same question.
+        unless ($masterQACombo.question eq $filledOutQACombo.question) {
             @warnings.append(WarningInfo.new(warning => QUESTION_MISMATCH_ERROR, questionNumber => $i));
             next;
         }
-        # check answers
-        {
-         # check if exactly one marked answer
-         # check if marked answers match
-          #=> count++
 
-         # check if number of answers match
-            #for each answer in master
-            # check all answers for matching exactly
-            # return for each mismatch an answer mismatch error incl "expected answer text" question number
+        # Check if answered correctly.
+        if ($filledOutQACombo.markedAnswers.elems == 1 && $masterQACombo.markedAnswer eq $filledOutQACombo
+                .markedAnswer) {
+            $score++;
         }
+
+        # Check if any warnings need to be applied for this answer block.
+        my @filledOutAnswers = $filledOutQACombo.getAllAnswerTexts();
+
+        my @masterAnswers = $masterQACombo.getAllAnswerTexts();
+        my @unmatchedFilledOutAnswers = ();
+
+        FILLED_OUT_ANSWERS_LOOP:
+        while @filledOutAnswers.elems > 0 {
+            # take out the first Answer one after the other and check if the answer matches a master answer
+            my $filledOutAnswerText = @filledOutAnswers.unshift;
+
+            MASTER_ANSWERS_TO_COMPARE_TO:
+            for ^@masterAnswers -> $masterAnswerIndex {
+                if (@masterAnswers[$masterAnswerIndex] eq $filledOutAnswerText) {
+                    # found match
+                    @masterAnswers.splice($masterAnswerIndex, 1);
+                    #remove from MasterAnswers and end the loop for this $filledOutAnswerText
+                    next FILLED_OUT_ANSWERS_LOOP;
+                }
+            }
+            # We found no exact match for our $filledOutAnswerText:
+            @unmatchedFilledOutAnswers.append($filledOutAnswerText);
+        }
+
+        # @masterAnswers now holds only the unmatched ones.
+        if (@unmatchedFilledOutAnswers || @masterAnswers) { #if any has elements
+            @warnings.append(WarningInfo.new(warning => ANSWER_MISMATCH_ERROR, questionNumber => $i,
+                    expectedAnswerTexts => @masterAnswers, actualAnswerTexts => @unmatchedFilledOutAnswers));
+        }
+
+
+
+        # check if number of answers match
+        #for each answer in master
+        # check all answers for matching exactly
+        # return for each mismatch an answer mismatch error incl "expected answer text" question number
     }
     return OkTestResult.new(:@warnings, :$score, :$comments, :$fileName)
 }
-
-
-    #TODO
-    #TODO
-    #TODO
-
-
-#TODO check if intro is there-> warning
 
 
 
