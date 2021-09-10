@@ -164,8 +164,9 @@ sub evaluateFilledOutFileExactly(:$parsedMasterFile, :$parsedFilledOutFile) retu
 
         FILLED_OUT_ANSWERS_LOOP:
         while @filledOutAnswers.elems > 0 {
+            say "@filledOutAnswers.elems: " ~ @filledOutAnswers.elems;
             # take out the first Answer one after the other and check if the answer matches a master answer
-            my $filledOutAnswerText = @filledOutAnswers.unshift;
+            my $filledOutAnswerText = @filledOutAnswers.pop();
 
             MASTER_ANSWERS_TO_COMPARE_TO:
             for ^@masterAnswers -> $masterAnswerIndex {

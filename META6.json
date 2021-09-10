@@ -16,10 +16,12 @@
   ],
   "build-depends": [],
   "test-depends": [],
-  "provides": {
-    "evaluateFilledOutFiles": "lib/evaluateFilledOutFiles.pm6"
-  },
-  "resources": [],
+  "provides": {},
+  "resources": [
+    "filled_out_very_short_file_02.txt",
+    "master_very_short_file.txt",
+    "filled_out_very_short_file_01.txt"
+  ],
   "license": "Write me!",
   "source-url": "Write me!"
 }
