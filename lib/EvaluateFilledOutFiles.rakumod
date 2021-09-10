@@ -51,8 +51,7 @@ class WarningInfo is export {
     method isSevere() returns Bool {
         return True if  ($!warning == QUESTION_COUNT_ERROR ||
                 $!warning == QUESTION_MISMATCH_ERROR ||
-                $!warning == ANSWER_MISMATCH_ERROR ||
-                $!warning == ANSWER_MISSING_ERROR);
+                $!warning == ANSWER_MISMATCH_ERROR);
         return False;
     }
 }
@@ -86,18 +85,20 @@ class OkTestResult is export is TestResult {
     }
 
     #| returns true if the evaluation finished without fatal errors
-    method isOK() returns Bool{
+    method isOK() returns Bool {
         return True;
     }
 }
 
 sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
-    my EFParser $parsedMasterFile = EFParser
-            .new(fileName => $masterFileName) or die "The MasterFile could not be Parsed";
+    say "Enter eval FiledOutFile";
+    my EFParser $parsedMasterFile = EFParser.new(fileName => $masterFileName) or die "The MasterFile could not be Parsed";
     die unless isMasterFileOk(:$parsedMasterFile);
     my TestResult @results = gather {
         for @filledOutFileNames -> $givenFileName {
+            say "EnterGlobingLoop";
             for glob($givenFileName) -> $filledOutFile {
+                say "Enter after Globbing. givenFileName = $givenFileName, filledOutFile = $filledOutFile";
                 my $parsedFilledOutFile;
                 try {
                     $parsedFilledOutFile = EFParser.new(fileName => $filledOutFile.relative);
@@ -112,6 +113,7 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
             }
         }
     }
+    say "TODO Process Results " ~ @results;
     #    my TestResult $testResult = TestResult.new(fileName => "i'm the FileName", score => 5, comments => "i'm a comment");
     #    say $testResult;
 }
@@ -119,6 +121,7 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
 
 #| Evaluates all Questions in both files, if they match exactly (task 1b).
 sub evaluateFilledOutFileExactly(:$parsedMasterFile, :$parsedFilledOutFile) returns TestResult {
+    say "enter evaluateFilledOutFileExactly";
     my @warnings;
     my Int $score = 0;
     my Str $fileName = $parsedFilledOutFile.fileName;
@@ -130,25 +133,26 @@ sub evaluateFilledOutFileExactly(:$parsedMasterFile, :$parsedFilledOutFile) retu
     }
 
 
-    for ^$parsedMasterFile.QACombos -> $i{
+    for ^$parsedMasterFile.QACombos -> $QAComboIndex {
+        say "Enter Loop for $QAComboIndex th QACombo";
         # If there is no question from the student file, some questions might have gone missing.
-        unless ($parsedFilledOutFile.QACombo[$i]) {
-            @warnings.append(WarningInfo.new(warning => QUESTION_COUNT_ERROR, questionNumber => $i));
+        unless ($parsedFilledOutFile.QACombos[$QAComboIndex]) {
+            @warnings.append(WarningInfo.new(warning => QUESTION_COUNT_ERROR, questionNumber => $QAComboIndex));
             last;
         }
 
-        my $masterQACombo = $parsedMasterFile.QACombos[$i];
-        my $filledOutQACombo = $parsedFilledOutFile.QACombos[$i];
+        my $masterQACombo = $parsedMasterFile.QACombos[$QAComboIndex];
+        my $filledOutQACombo = $parsedFilledOutFile.QACombos[$QAComboIndex];
 
         # If the questions don't match, we can't evaluate it, as we can't guarantee it's the same question.
         unless ($masterQACombo.question eq $filledOutQACombo.question) {
-            @warnings.append(WarningInfo.new(warning => QUESTION_MISMATCH_ERROR, questionNumber => $i));
+            @warnings.append(WarningInfo.new(warning => QUESTION_MISMATCH_ERROR, questionNumber => $QAComboIndex));
             next;
         }
 
         # Check if answered correctly.
-        if ($filledOutQACombo.markedAnswers.elems == 1 && $masterQACombo.markedAnswer eq $filledOutQACombo
-                .markedAnswer) {
+        if ($filledOutQACombo.markedAnswers.elems == 1 &&
+                $masterQACombo.markedAnswers eq $filledOutQACombo.markedAnswers) {
             $score++;
         }
 
@@ -178,7 +182,7 @@ sub evaluateFilledOutFileExactly(:$parsedMasterFile, :$parsedFilledOutFile) retu
 
         # @masterAnswers now holds only the unmatched ones.
         if (@unmatchedFilledOutAnswers || @masterAnswers) { #if any has elements
-            @warnings.append(WarningInfo.new(warning => ANSWER_MISMATCH_ERROR, questionNumber => $i,
+            @warnings.append(WarningInfo.new(warning => ANSWER_MISMATCH_ERROR, questionNumber => $QAComboIndex,
                     expectedAnswerTexts => @masterAnswers, actualAnswerTexts => @unmatchedFilledOutAnswers));
         }
 
@@ -195,6 +199,7 @@ sub evaluateFilledOutFileExactly(:$parsedMasterFile, :$parsedFilledOutFile) retu
 
 
 sub isMasterFileOk(EFParser :$parsedMasterFile) {
+    say "enter is MasterFileOk";
     for $parsedMasterFile.QACombos -> $QACombo {
         if $QACombo.markedAnswers.elems > 1 {
             die "The MasterFile has multiple correct answers for one of the questions, only one is allowed";

@@ -33,6 +33,8 @@ class EFParser is export {
             :$!separator = '_' x 80,
             :$!endOfExamText = " " x 34 ~ "END OF EXAM")
     {
+        say "Building an EFParser";
+        say "Building an EFParser";
         unless ($!fileName.IO.e && $!fileName.IO.r) {
             die "File doesn't exist";
             # TODO better file error handling
@@ -40,7 +42,7 @@ class EFParser is export {
         
         my Str $fileContent = $!fileName.IO.slurp;
         my Match $parseTree = ExamFileGrammar.parse($fileContent) or die "Parsing of file $!fileName failed!";
-        
+        say "Parsed";
         # The structure of the parse tree (only the relevant info)
         # $parsed{"QACombo"}[0]{"answers"}{"answer"}[0]{"marker"}
         # $parsed{"QACombo"}[0]{"answers"}{"answer"}[0]{"answerText"}
