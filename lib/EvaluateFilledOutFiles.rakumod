@@ -4,23 +4,10 @@ use IO::Glob;
 use ExamFileParser;
 use DisplayEvaluatedResult;
 
-#my Str $WRONG_QA_COUNT = "The number of Questions in the MasterFile and the StudentFile do not match";
 #|Fatal Errors, these mean the file could not be evaluated at all and needs to be looked at by the examiner
-enum TestFailedReason <
-    PARSING_ERROR
->;
-# currently not useful, as the parse Error is the only reason
-#class ErrorInfo is export {
-#    has TestFailedReason $.reason is required;
-#    has Int $.questionNumber;
-#
-#    method isFatal() returns Bool {
-#        if ($!reason == PARSING_ERROR) {
-#            return True;
-#        }
-#        return False;
-#    }
-#}
+enum TestFailedReason (
+    PARSING_FAILURE => "Parsing Failure"
+);
 
 #| Warnings that came up during evaluation.
 #| Some are mostly just informational, some require the attention of the examiner to ensure correct grading.
@@ -165,7 +152,7 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
                     $parsedFilledOutFile = EFParser.new(fileName => $filledOutFile.relative);
                     CATCH {
                         default {
-                            take FailedTestResult.new(reason => PARSING_ERROR, fileName => $filledOutFile.relative);
+                            take FailedTestResult.new(reason => PARSING_FAILURE, fileName => $filledOutFile.relative);
                             next;
                         }
                     }

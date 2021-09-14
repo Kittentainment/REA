@@ -17,9 +17,9 @@ sub handleResults(:@results) is export {
     
     displayWarnings(:@results);
     
-    say $strongSeparator;
+    displayFailures(:@results);
     
-    displayErrors(:@results);
+    say $strongSeparator;
     
 }
 
@@ -52,8 +52,6 @@ sub displayWarnings(:@results) {
     say "The following files have thrown one or more warnings. Further examination might be necessary.";
     say "Warnings marked with a $symbolForSevereAnswers mean we can't guarantee correct grading for this file. We highly reccommend further examination!\n";
     
-    
-    
     for @results -> $result {
         next if (!$result.isOk || !$result.hasWarnings);
         
@@ -71,10 +69,30 @@ sub displaySingleFileWarnings(:$result) {
 }
 
 
-sub displayErrors(:@results) {
+sub displayFailures(:@results) {
+    my @allFailures = getAllFailures(:@results);
+    return unless (@allFailures);
+
+    say $strongSeparator;
+    say "\nERRORS\n";
+    say "The following files have failed to be evaluated completely:\n";
+
+    for @allFailures -> $failedResult {
+        say $failedResult.reason ~ ": " ~ $failedResult.fileName;
+    }
+    
+    say "";
     
 }
 
+sub getAllFailures(:@results) {
+    gather {
+        for @results -> $result {
+            next if ($result.isOk);
+            take $result;
+        }
+    }
+}
 
 
 
