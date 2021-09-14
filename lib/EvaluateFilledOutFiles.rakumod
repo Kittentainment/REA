@@ -35,7 +35,7 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
     
     @results .= sort({ .fileName.Str });
     
-    handleResults(:@results);
+    return @results;
 }
 
 

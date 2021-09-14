@@ -2,16 +2,18 @@
 use ExamFileParser;
 use MasterFileConverter;
 use EvaluateFilledOutFiles;
-#|{ REA (Raku Exam Automation) Takes two arguments:
+use DisplayEvaluatedResult;
+
+#| REA (Raku Exam Automation) Takes two arguments:
 #| - which command shall be executed
 #| - the name of the MasterFile
-}
 sub MAIN($command, $masterFileName, *@filledOutFileNames) {
     if ($command ~~ /c[reate]?/) {
         createTestsFromMasterFile(:$masterFileName, count => 1);
     }
     elsif($command ~~ /e[val[uate]?]?/) {
-        evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames);
+        my @results = evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames);
+        handleResults(:@results);
     }
     elsif ($command ~~ /'-'h|help/) {
         showHelp();

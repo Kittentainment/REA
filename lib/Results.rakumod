@@ -165,11 +165,11 @@ class OkTestResult is TestResult is export {
         return $string;
     }
     
-    method getWarningsAsString(:$symbolForSevereAnswers, :$lineIndent, :$extended = True) returns Str {
+    method getWarningsAsString(:$symbolForSevereAnswers, :$lineIndent, :$verbose = True) returns Str {
         my $string = "";
         $string ~= $.fileName ~ ":\n";
         for self.warnings -> $warningInfo {
-            if ($extended) {
+            if ($verbose) {
                 $string ~= $warningInfo.toExtendedString(:$symbolForSevereAnswers, :$lineIndent);
             } else {
                 $string ~= $warningInfo.toSingleLineString(:$symbolForSevereAnswers, :$lineIndent);
