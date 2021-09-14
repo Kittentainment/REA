@@ -66,13 +66,13 @@ sub displayWarnings(:@results) {
 sub displaySingleFileWarnings(:$result) {
     say $result.fileName ~ ":";
     for $result.warnings -> $warningInfo {
-        say $warningInfo.toString(:$symbolForSevereAnswers, lineIndent => "\t");
+        print $warningInfo.toExtendedString(:$symbolForSevereAnswers, lineIndent => "\t");
     }
 }
 
 
 sub displayErrors(:@results) {
-
+    
 }
 
 
