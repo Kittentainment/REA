@@ -128,8 +128,9 @@ class TestResult is export {
     
     #| returns true if the evaluation finished without fatal errors.
     method isOk() returns Bool {...}
+
+    method getResultAsString(:$displayWidth) returns Str {...}
     
-    method getResultAsString() {...}
 }
 
 #| An OkTestResult means the evaluation succeeded at least partially. Maybe some warnings were thrown, that need to be looked at.
@@ -149,7 +150,19 @@ class OkTestResult is TestResult is export {
         return True;
     }
 
-    method getResultAsString() {...}
+    method getResultAsString(:$displayWidth) returns Str {
+        my $string = "";
+        $string ~= $.fileName;
+        
+        $string ~= '.' x ($displayWidth - $.fileName.chars - 5);
+        $string ~= sprintf("%02d/%02d", self.score, self.triedToAnswer);
+        
+        return $string;
+    }
+    
+    method getWarningsAsString() returns Str {
+    
+    }
 }
 
 #| A FailedTestResult means that the evaluation failed completely and needs to be done by the examiner.
@@ -161,7 +174,15 @@ class FailedTestResult is TestResult is export {
         return False; # Failures are always fatal, meaning this file could not be evaluated.
     }
 
-    method getResultAsString() {...}
+    method getResultAsString(:$displayWidth) returns Str {
+        my $string = "";
+        $string ~= $.fileName;
+        
+        $string ~= '.' x ($displayWidth - $.fileName.chars - self.failure.Str.chars);
+        $string ~= self.failure.Str;
+        
+        return $string;
+    }
 }
 
 

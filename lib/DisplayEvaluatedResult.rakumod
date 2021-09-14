@@ -29,18 +29,7 @@ sub displayResults(:@results) {
     say "\nRESULTS:\n";
     
     for @results -> $result {
-        my Str $fileName = $result.fileName;
-        
-        print $fileName;
-        if ($result.isOk) {
-            print '.' x ($displayWidth - $fileName.chars - 5);
-            printf "%02d/%02d", $result.score, $result.triedToAnswer;
-        } else {
-            print '.' x ($displayWidth - $fileName.chars - $result.failure.Str.chars);
-            print $result.failure.Str;
-        }
-        
-        say "";
+        say $result.getResultAsString(:$displayWidth);
     }
     
     say "\n$lightSeparator\n";
