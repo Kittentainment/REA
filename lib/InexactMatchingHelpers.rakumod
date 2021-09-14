@@ -29,3 +29,6 @@ sub normalizeText(:$text) returns Str is export {
     return $newText;
 }
 
+sub isDamerauLevenstheinCompatible(Str :$expectedText, Str :$actualTest, Int :$maxDifferece) returns Bool {
+
+}
