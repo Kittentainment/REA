@@ -76,23 +76,23 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
         }
         
         # For every answer in the exam file, find the best matching answer in the master file.
-        my Answer @filledOutAnswers = $filledOutQACombo.allAnswers();
-        my Answer @masterAnswers = $masterQACombo.allAnswers();
+        my Str @filledOutAnswerTexts = $filledOutQACombo.getAllAnswerTexts();
+        my Str @masterAnswerTexts = $masterQACombo.getAllAnswerTexts();
         my Str @unmatchedFilledOutAnswers;
         my Str @unmatchedMasterAnswers;
         my %masterToFilledOutMatcher; # Matches the text of the master answer to it's matched filled out answer (if a match was found).
         
         MASTER_ANSER_LOOP:
-        for ^@masterAnswers -> $masterAnswerIndex {
+        for ^@masterAnswerTexts -> $masterAnswerIndex {
             # take out the first Answer one after the other and compare them.
-            my Str $masterAnswerText = @masterAnswers[$masterAnswerIndex].answerText;
+            my Str $masterAnswerText = @masterAnswerTexts[$masterAnswerIndex];
     
             my Int $shortestDistance;
             my Int $bestFoundAnswerIndex;
     
             GIVEN_ANSWER_TO_COMPARE_TO_LOOP:
-            for ^@filledOutAnswers -> $filledOutAnswerIndex {
-                my Str $filledOutAnswerText = @filledOutAnswers[$filledOutAnswerIndex].answerText;
+            for ^@filledOutAnswerTexts -> $filledOutAnswerIndex {
+                my Str $filledOutAnswerText = @filledOutAnswerTexts[$filledOutAnswerIndex];
                 my Int $distance = dld($masterAnswerText, $filledOutAnswerText);
                 next unless (isGivenDistanceOK(:$distance, expectedText => $masterAnswerText));
                 # ignore if it's not at least similar.
@@ -110,7 +110,7 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
                 @unmatchedMasterAnswers.append($masterAnswerText);
                 next;
             }
-            my $filledOutanswerText = @filledOutAnswers[$bestFoundAnswerIndex].answerText;
+            my $filledOutanswerText = @filledOutAnswerTexts[$bestFoundAnswerIndex];
             unless ($filledOutanswerText eq $masterAnswerText) {
                 # We found a match, but only with a certain Damerau Levenshtein Distance. Inform the examiner about it.
                 @warnings.append(WarningInfo.new(warning => ANSWER_MISMATCH, questionNumber => $QAComboIndex,
@@ -123,8 +123,8 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
         if ($filledOutQACombo.markedAnswers.elems == 1) {
             $triedToAnswer++;
             # The student gave a valid answer. Now we have to check if it is also correct.
-            my $singleMarkedAnswerText = @filledOutAnswers[0].answerText;
-            my $correctAnswerText = @masterAnswers[0].answerText;
+            my $singleMarkedAnswerText = @filledOutAnswerTexts[0];
+            my $correctAnswerText = @masterAnswerTexts[0];
             if (%masterToFilledOutMatcher{$correctAnswerText}
                     && %masterToFilledOutMatcher{$correctAnswerText} eq $singleMarkedAnswerText) {
                 $score++;

@@ -2,10 +2,6 @@ unit module ExamFileParser;
 
 use ExamFileGrammar;
 
-class Answer is export {
-    has Str $.answerText is required;
-    has Bool $.isMarked is required;
-}
 
 #| Holds a Question with all its answers.
 #| Stores the answers separately, whether they were marked or not.
@@ -13,16 +9,6 @@ class QACombo is export {
     has Str $.question is required;
     has Str @.markedAnswers is required;
     has Str @.unmarkedAnswers is required;
-    has Answer @.allAnswers;
-    
-    submethod BUILD(:$!question, :@!markedAnswers, :@!unmarkedAnswers) {
-        for @!markedAnswers -> $answer {
-            @!allAnswers.append(Answer.new(isMarked => True, answerText => $answer))
-        }
-        for @!markedAnswers -> $answer {
-            @!allAnswers.append(Answer.new(isMarked => False, answerText => $answer))
-        }
-    }
     
     submethod getAllAnswerTexts() {
         return (@!markedAnswers, @!unmarkedAnswers).flat;
