@@ -56,7 +56,7 @@ class WarningInfo is export {
             }
             when ANSWER_MISMATCH {
                 my Str $string = $lineIndent;
-                $string ~= $!warning.Str ~ " - The following answers at question $!questionNumber were assumed to be the same:\n";
+                $string ~= $!warning.Str ~ " - The following answers were assumed to be the same for question $!questionNumber:\n";
                 $string ~= $lineIndent x 2 ~ "expected: $!expectedAnswerText\n";
                 $string ~= $lineIndent x 2 ~ "actual:   $!actualAnswerText\n";
                 return $string;

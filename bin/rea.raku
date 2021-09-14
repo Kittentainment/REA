@@ -1,4 +1,4 @@
-#!/usr/bin/env raku
+#!/usr/bin/env raku -Ilib
 use ExamFileParser;
 use MasterFileConverter;
 use EvaluateFilledOutFiles;
