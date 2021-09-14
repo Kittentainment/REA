@@ -7,6 +7,7 @@ my Int $displayWidth = 120;
 my Str $lightSeparator = '-' x $displayWidth;
 my Str $strongSeparator = '=' x $displayWidth;
 my $symbolForSevereAnswers = '!';
+my $lineIndent = "\t";
 
 
 sub handleResults(:@results) is export {
@@ -43,19 +44,11 @@ sub displayWarnings(:@results) {
     
     for @results -> $result {
         next if (!$result.isOk || !$result.hasWarnings);
-        
-        displaySingleFileWarnings(:$result);
-        say "";
+        say $result.getWarningsAsString(:$symbolForSevereAnswers, :$lineIndent, extended => True);
     }
     
 }
 
-sub displaySingleFileWarnings(:$result) {
-    say $result.fileName ~ ":";
-    for $result.warnings -> $warningInfo {
-        print $warningInfo.toExtendedString(:$symbolForSevereAnswers, lineIndent => "\t");
-    }
-}
 
 
 sub displayFailures(:@results) {
@@ -67,8 +60,7 @@ sub displayFailures(:@results) {
     say "The following files have failed to be evaluated completely:\n";
 
     for @allFailures -> $failedResult {
-        say $failedResult.fileName ~ ":";
-        say $failedResult.failure.toSingleLineString;
+        say $failedResult.getFailuresAsString();
     }
     
     say "";

@@ -160,8 +160,17 @@ class OkTestResult is TestResult is export {
         return $string;
     }
     
-    method getWarningsAsString() returns Str {
-    
+    method getWarningsAsString(:$symbolForSevereAnswers, :$lineIndent, :$extended = True) returns Str {
+        my $string = "";
+        $string ~= $.fileName ~ ":\n";
+        for self.warnings -> $warningInfo {
+            if ($extended) {
+                $string ~= $warningInfo.toExtendedString(:$symbolForSevereAnswers, :$lineIndent);
+            } else {
+                $string ~= $warningInfo.toSingleLineString(:$symbolForSevereAnswers, :$lineIndent);
+            }
+        }
+        return $string;
     }
 }
 
@@ -171,9 +180,10 @@ class FailedTestResult is TestResult is export {
     
     #| returns true if the evaluation finished without fatal errors.
     method isOk() returns Bool {
-        return False; # Failures are always fatal, meaning this file could not be evaluated.
+        return False;
+        # Failures are always fatal, meaning this file could not be evaluated.
     }
-
+    
     method getResultAsString(:$displayWidth) returns Str {
         my $string = "";
         $string ~= $.fileName;
@@ -182,6 +192,10 @@ class FailedTestResult is TestResult is export {
         $string ~= self.failure.Str;
         
         return $string;
+    }
+    
+    method getFailuresAsString() returns Str {
+        return self.fileName ~ ":\n" ~ self.failure.toSingleLineString;
     }
 }
 
