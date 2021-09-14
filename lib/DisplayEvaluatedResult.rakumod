@@ -36,8 +36,8 @@ sub displayResults(:@results) {
             print '.' x ($displayWidth - $fileName.chars - 5);
             printf "%02d/%02d", $result.score, $result.triedToAnswer;
         } else {
-            print '.' x ($displayWidth - $fileName.chars - $result.reason.chars);
-            print $result.reason
+            print '.' x ($displayWidth - $fileName.chars - $result.failure.Str.chars);
+            print $result.failure.Str;
         }
         
         say "";
@@ -78,7 +78,8 @@ sub displayFailures(:@results) {
     say "The following files have failed to be evaluated completely:\n";
 
     for @allFailures -> $failedResult {
-        say $failedResult.reason ~ ": " ~ $failedResult.fileName;
+        say $failedResult.fileName ~ ":";
+        say $failedResult.failure.toSingleLineString;
     }
     
     say "";

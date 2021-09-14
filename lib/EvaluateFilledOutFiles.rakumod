@@ -9,6 +9,22 @@ enum TestFailedReason (
     PARSING_FAILURE => "Parsing Failure"
 );
 
+#| Failures that came up during evaluation.
+#| These all mean we completely failed to evaluate this file.
+#| Maybe we were handed the wrong file, maybe there's an edge case our grammar can't handle.
+#| (Not currently necessary to build a class around the TestFailedReason, but for consistency with WarningInfo and extendability)
+class FailureInfo is export {
+    has TestFailedReason $.failure is required;
+
+    method toSingleLineString(:$lineIndent = "\t") returns Str {
+        return $lineIndent ~ $!failure.uc ~ "\n";
+    }
+
+    method Str() returns Str {
+        return self.failure;
+    }
+}
+
 #| Warnings that came up during evaluation.
 #| Some are mostly just informational, some require the attention of the examiner to ensure correct grading.
 enum TestResultWarnings (
@@ -113,7 +129,7 @@ class TestResult is export {
 
 #| A FailedTestResult means that the evaluation failed completely and needs to be done by the examiner
 class FailedTestResult is export is TestResult {
-    has TestFailedReason $.reason is required;
+    has FailureInfo $.failure is required;
     
     #| returns true if the evaluation finished without fatal errors
     method isOk() returns Bool {
@@ -152,7 +168,7 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
                     $parsedFilledOutFile = EFParser.new(fileName => $filledOutFile.relative);
                     CATCH {
                         default {
-                            take FailedTestResult.new(reason => PARSING_FAILURE, fileName => $filledOutFile.relative);
+                            take FailedTestResult.new(failure => FailureInfo.new(failure => PARSING_FAILURE), fileName => $filledOutFile.relative);
                             next;
                         }
                     }
