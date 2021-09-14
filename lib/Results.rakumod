@@ -2,6 +2,7 @@ unit module Results;
 
 #| The Types of warnings that can come up during evaluation of a file.
 #| Some are mostly just informational, some require the attention of the examiner to ensure correct grading.
+#| The more severe ones end in "Error".
 enum TestResultWarnings is export (
     INTRO_MISMATCH          => "Intro Mismatch",
     QUESTION_MISMATCH       => "Question Mismatch",

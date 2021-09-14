@@ -1,7 +1,6 @@
 unit module EvaluateFilledOutFiles;
 
 use IO::Glob;
-use Text::Levenshtein::Damerau;
 use ExamFileParser;
 use DisplayEvaluatedResult;
 use Results;
