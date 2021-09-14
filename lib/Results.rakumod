@@ -49,13 +49,17 @@ class WarningInfo is export {
     method toExtendedString(:$symbolForSevereAnswers = '!', :$lineIndent = "\t") returns Str {
         given $!warning {
             when INTRO_MISMATCH {
-                return $lineIndent ~ "Intro Mismatch: This file's intro text differs from the intro in the master file.\n";
+                return $lineIndent ~ "Intro Mismatch - This file's intro text differs from the intro in the master file.\n";
             }
             when QUESTION_MISMATCH {
                 return $lineIndent ~ "TODO " ~ $!warning.Str ~ "\n";
             }
             when ANSWER_MISMATCH {
-                return $lineIndent ~ "TODO " ~ $!warning.Str ~ "\n";
+                my Str $string = $lineIndent;
+                $string ~= $!warning.Str ~ " - The following answers at question $!questionNumber were assumed to be the same:\n";
+                $string ~= $lineIndent x 2 ~ "expected: $!expectedAnswerText\n";
+                $string ~= $lineIndent x 2 ~ "actual:   $!actualAnswerText\n";
+                return $string;
             }
             when QUESTION_COUNT_ERROR {
                 return $lineIndent ~ "$symbolForSevereAnswers Question Count Error: Expected $.expectedQuestionCount questions, file only has $.actualQuestionCount questions.\n";
@@ -67,16 +71,16 @@ class WarningInfo is export {
                 my Str $string = $lineIndent ~ $symbolForSevereAnswers;
                 if (@!actualAnswerTexts.elems == 0) {# yes this could be made simpler, but it's clearer that way.
                     # Too many expected answers -> answers missing
-                    $string ~= "Answers Missing: The following answers were not present for question $!questionNumber:\n";
+                    $string ~= "Answers Missing - The following answers were not present for question $!questionNumber:\n";
                     $string ~= self!listAllAnswers(answerList => @!expectedAnswerTexts, lineIndent => $lineIndent x 3);
                 }
                 elsif (@!expectedAnswerTexts.elems == 0) {
                     # Too many given answers -> new ones were added. Maybe the master file had no correct answer?
-                    $string ~= "Too Many Answers: The following answers were added for question $!questionNumber:\n";
+                    $string ~= "Too Many Answers - The following answers were added for question $!questionNumber:\n";
                     $string ~= self!listAllAnswers(answerList => @!actualAnswerTexts, lineIndent => $lineIndent x 3);
                 }
                 else {
-                    $string ~= "Answer Mismatch: Some answers don't match the ones from the exam file on question $!questionNumber.\n";
+                    $string ~= "Answer Mismatch - Some answers don't match the ones from the exam file on question $!questionNumber.\n";
                     $string ~= ($lineIndent x 2) ~ "Expected:\n";
                     $string ~= self!listAllAnswers(answerList => @!expectedAnswerTexts, lineIndent => $lineIndent x 3);
                     $string ~= ($lineIndent x 2) ~ "Actual:\n";
