@@ -20,31 +20,31 @@ subtest "Test isDamerauLevenstheinCompatible" => {
     {
         my Str $expectedText = "AABCDE";
         my Str $actualText = "AABCDE";
-        is isDamerauLevenstheinCompatible(:$expectedText, :$actualText), True, "Same String";
+        is isDamerauLevenshteinCompatible(:$expectedText, :$actualText), True, "Same String";
     }
     
     {
         my Str $expectedText = "A completely different string that actually means something";
         my Str $actualText = "asdljglkmvoiweio;i3emrvio sdjflksdlkv";
-        isnt isDamerauLevenstheinCompatible(:$expectedText, :$actualText), True, "completely different String";
+        isnt isDamerauLevenshteinCompatible(:$expectedText, :$actualText), True, "completely different String";
     }
     
     {
         my Str $expectedText = "A very similar string to what is expected";
         my Str $actualText = "very similar string to what is expected";
-        is isDamerauLevenstheinCompatible(:$expectedText, :$actualText), True, "very similar string";
+        is isDamerauLevenshteinCompatible(:$expectedText, :$actualText), True, "very similar string";
     }
 
     {
         my Str $expectedText = "ABCDEFGHIJ";
         my Str $actualText = "ABCDEFGHIj";
-        is isDamerauLevenstheinCompatible(:$expectedText, :$actualText), True, "String with exactly 1 distance in 10 chars (10%)";
+        is isDamerauLevenshteinCompatible(:$expectedText, :$actualText), True, "String with exactly 1 distance in 10 chars (10%)";
     }
 
     {
         my Str $expectedText = "ABCDEFGHIJ";
         my Str $actualText = "ABCDEFGHij";
-        isnt isDamerauLevenstheinCompatible(:$expectedText, :$actualText), True, "String with exactly 2 distance in 10 chars (20%)";
+        isnt isDamerauLevenshteinCompatible(:$expectedText, :$actualText), True, "String with exactly 2 distance in 10 chars (20%)";
     }
 }
 

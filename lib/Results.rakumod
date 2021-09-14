@@ -13,6 +13,13 @@ enum TestResultWarnings is export (
     ANSWER_MISMATCH_ERROR   => "Answer Mismatch Error",
 );
 
+#| Fatal Errors
+#| These mean the file could not be evaluated at all and needs to be looked at by the examiner.
+enum TestFailedReason is export (
+    PARSING_FAILURE => "Parsing Failure"
+);
+
+
 #| WarningInfo stores additional information on the Warning that occurred
 class WarningInfo is export {
     has TestResultWarnings $.warning is required;
@@ -95,13 +102,6 @@ class WarningInfo is export {
     }
 }
 
-
-
-#| Fatal Errors
-#| These mean the file could not be evaluated at all and needs to be looked at by the examiner.
-enum TestFailedReason is export (
-    PARSING_FAILURE => "Parsing Failure"
-);
 
 #| Failures that were thrown during evaluation of a file.
 #| These all mean we completely failed to evaluate this file.

@@ -32,9 +32,9 @@ sub normalizeText(Str $text) returns Str is export {
     return $newText;
 }
 
-#| Returns True if the LevenstheinDamerau distance is ≤ than $maxDifference (in %) of the length of the $expectedText.
-sub isDamerauLevenstheinCompatible(Str :$expectedText, Str :$actualText, Int :$maxDifferece = 10) returns Bool is export {
-    my Int $maxDistance = ($expectedText.chars * $maxDifferece) div 100;
+#| Returns True if the LevenshteinDamerau distance is ≤ than $maxDifference (in %) of the length of the $expectedText.
+sub isDamerauLevenshteinCompatible(Str :$expectedText, Str :$actualText, Int :$maxDifference = 10) returns Bool is export {
+    my Int $maxDistance = ($expectedText.chars * $maxDifference) div 100;
     my Int $distance = dld($actualText, $expectedText, $maxDistance);
     if ($distance.defined) { # dld returns an undefined Int if it doesn't match until $maxDistance is reached.
         return True;
@@ -43,6 +43,15 @@ sub isDamerauLevenstheinCompatible(Str :$expectedText, Str :$actualText, Int :$m
     }
 }
 
-sub normalizeAndCheckDistance(Str :$expectedText, Str :$actualText, Int :$maxDifferece = 10) returns Bool is export {
-    return isDamerauLevenstheinCompatible(expectedText => normalizeText($expectedText), actualText => normalizeText($actualText), :$maxDifferece)
+#| Calculates whether the given LevenshteinDamerau distance is ≤ than $maxDifference (in %) of the length of the $expectedText.
+#| Used instead of isDamerauLevenshteinCompatible if the actual distance is also needed
+sub isGivenDistanceOK(Int :$distance, Str :$expectedText, Int :$maxDifference = 10) returns Bool is export {
+    my Int $maxDistance = ($expectedText.chars * $maxDifference) div 100;
+    return $distance > $maxDistance ?? False !! True;
+}
+
+#| Normalizes the given strings with normalizeText and calls isDamerauLevenstheinCompatible with the normalized strings.
+#| Just for convenience, because those two methods will often be used combined like that.
+sub normalizeAndCheckDistance(Str $expectedText, Str $actualText, Int :$maxDifference = 10) returns Bool is export {
+    return isDamerauLevenshteinCompatible(expectedText => normalizeText($expectedText), actualText => normalizeText($actualText), :$maxDifference)
 }
