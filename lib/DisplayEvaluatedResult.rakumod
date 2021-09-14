@@ -14,7 +14,7 @@ my $showWarnings = True;
 
 sub handleResults(:@results) is export {
     
-    askForWarningsAndErrors();
+#    askForWarnings();
     askForVerboseOutput();
     
     displayResults(:@results);
@@ -25,7 +25,7 @@ sub handleResults(:@results) is export {
 }
 
 
-sub askForWarningsAndErrors() {
+sub askForWarnings() {
     $showWarnings = askYesNoQuestion('Show warnings?');
 }
 
