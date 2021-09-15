@@ -14,15 +14,77 @@ class StatisticData is export {
     has Int $.maxTriesCount;
     
     method toString(:$displayWidth) returns Str {
-        my Str $string;
-        my Str $averageScoreText = "Average number of questions answered";
-        $string ~= $averageScoreText;
-        $string ~= '.' x ($displayWidth - $averageScoreText.chars - 4);
-        $string ~= sprintf("%02.2f", self.averageTries);
+        my Int $resultLength = 18;
+        my Str $outputString;
+        
+        $outputString ~= self!getBlockOfAverage(
+                :$displayWidth,
+                :$resultLength,
+                averageText => "Average number of questions answered",
+                minText => "Minimum",
+                maxText => "Maximum",
+                average => $!averageTries,
+                min => $!minTries,
+                minCount => $!minTriesCount,
+                max => $!maxTries,
+                maxCount => $!maxTriesCount);
+        
+        $outputString ~= "\n";
+        
+        $outputString ~= self!getBlockOfAverage(
+                :$displayWidth,
+                :$resultLength,
+                averageText => "Average number of correct answers",
+                minText => "Minimum",
+                maxText => "Maximum",
+                average => $!averageScore,
+                min => $!minScore,
+                minCount => $!minScoreCount,
+                max => $!maxScore,
+                maxCount => $!maxScoreCount);
+        
+        return $outputString;
     }
+    
+    #| A string with the average, minimum and maximum displayed on three different lines
+    method !getBlockOfAverage(:$displayWidth,
+                              :$resultLength,
+                              :$averageText,
+                              :$minText,
+                              :$maxText,
+                              :$average,
+                              :$min,
+                              :$minCount,
+                              :$max,
+                              :$maxCount) returns Str {
+        my Str $outputString;
+        
+        $outputString ~= $averageText;
+        $outputString ~= '.' x ($displayWidth - $averageText.chars - $resultLength);
+        $outputString ~= sprintf("%3d", $average);
+        $outputString ~= "\n";
+        
+        my Str $extendedMinText = ' ' x ($averageText.chars - $minText.chars) ~ $minText;
+        $outputString ~= $extendedMinText;
+        $outputString ~= '.' x ($displayWidth - $extendedMinText.chars - $resultLength);
+        $outputString ~= sprintf("%3d", $min);
+        $outputString ~= "  ($minCount student{ $minCount == 1 ?? "" !! "s" })";
+        $outputString ~= "\n";
+        
+        my Str $extendedMaxText = ' ' x ($averageText.chars - $maxText.chars) ~ $maxText;
+        $outputString ~= $extendedMaxText;
+        $outputString ~= '.' x ($displayWidth - $extendedMaxText.chars - $resultLength);
+        $outputString ~= sprintf("%3d", $max);
+        $outputString ~= "  ($maxCount student{ $maxCount == 1 ?? "" !! "s" })";
+        $outputString ~= "\n";
+        
+        return $outputString;
+    }
+    
 }
 
-
+#| Calculates all the important statistic for our Results
+#| No existing module calculated the exact things we needed, so we just calculated it ourself.
 sub calculateStatistics(:@results) returns StatisticData is export {
     
     my Int @allScores;
@@ -76,7 +138,7 @@ sub calcMinMax(Int @data) returns List {
         } elsif ($entry == $min) {
             $minCount++;
         }
-        if (!$max.defined || $entry < $max) {
+        if (!$max.defined || $entry > $max) {
             $max = $entry;
             $maxCount = 1;
         } elsif ($entry == $max) {
