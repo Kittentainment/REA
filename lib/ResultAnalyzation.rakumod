@@ -12,6 +12,14 @@ class StatisticData is export {
     has Int $.minTriesCount;
     has Int $.maxTries;
     has Int $.maxTriesCount;
+    
+    method toString(:$displayWidth) returns Str {
+        my Str $string;
+        my Str $averageScoreText = "Average number of questions answered";
+        $string ~= $averageScoreText;
+        $string ~= '.' x ($displayWidth - $averageScoreText.chars - 4);
+        $string ~= sprintf("%02.2f", self.averageTries);
+    }
 }
 
 
@@ -28,34 +36,34 @@ sub calculateStatistics(:@results) returns StatisticData is export {
     }
     
     my Num $averageScore = calcAverage(@allScores);
-    my Int $minMaxScore = calcMinMax(@allScores);
+    my Int @minMaxScore = calcMinMax(@allScores);
     my Num $averageTries = calcAverage(@allTries);
-    my Int $minMaxTries = calcMinMax(@allTries);
+    my Int @minMaxTries = calcMinMax(@allTries);
     
     return StatisticData.new(
             :$averageScore,
-            minScore => $minMaxScore[0],
-            minScoreCount => $minMaxScore[1],
-            maxScore => $minMaxScore[2],
-            maxScoreCount => $minMaxScore[3],
+            minScore => @minMaxScore[0],
+            minScoreCount => @minMaxScore[1],
+            maxScore => @minMaxScore[2],
+            maxScoreCount => @minMaxScore[3],
             :$averageTries,
-            minTries => $minMaxTries[0],
-            minTriesCount => $minMaxTries[1],
-            maxTries => $minMaxTries[2],
-            maxTriesCount => $minMaxTries[3]
+            minTries => @minMaxTries[0],
+            minTriesCount => @minMaxTries[1],
+            maxTries => @minMaxTries[2],
+            maxTriesCount => @minMaxTries[3]
             )
     
 }
 
 #| Calculates the average of the given data
 sub calcAverage(Int @data) returns Num {
-    die "received an empty list" if @data.elems = 0;
+    die "received an empty list" if @data.elems == 0;
     return (([+] @data) / @data.elems).Num;
 }
 
 #| Returns a list in the form ($min, $minCount, $max, $maxCount)
 sub calcMinMax(Int @data) returns List {
-    die "received an empty list" if @data.elems = 0;
+    die "received an empty list" if @data.elems == 0;
     my $min;
     my $minCount;
     my $max;

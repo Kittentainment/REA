@@ -13,7 +13,9 @@
     "Data::Dump",
     "GTK::Simple",
     "IO::Glob",
-    "Text::Levenshtein::Damerau"
+    "Text::Levenshtein::Damerau",
+    "Stats",
+    "Math::Libgsl::Statistics"
   ],
   "build-depends": [],
   "test-depends": [],

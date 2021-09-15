@@ -68,7 +68,7 @@ sub displayResults(:@results) {
 sub displayStats(:@results) {
     my StatisticData $stats = calculateStatistics(:@results);
 
-    
+    say $stats.toString(:$displayWidth);
 }
 
 
