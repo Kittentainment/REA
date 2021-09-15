@@ -1,21 +1,23 @@
 unit module DisplayEvaluatedResult;
 
+use ResultAnalyzation;
+
 #enum DisplayMethods <CONSOLE FILE>;
 
 my Int $displayWidth = 120;
 
 my Str $lightSeparator = '-' x $displayWidth;
 my Str $strongSeparator = '=' x $displayWidth;
-my $symbolForSevereAnswers = '!';
-my $lineIndent = "\t";
-my $verbose = True;
-my $showWarnings = True;
+my Str $symbolForSevereAnswers = '!';
+my Str $lineIndent = "\t";
+my Bool $verbose = True;
+my Bool $showWarnings = True;
 
 
 sub handleResults(:@results) is export {
-    
+
 #    askForWarnings();
-    askForVerboseOutput();
+#    askForVerboseOutput();
     
     displayResults(:@results);
     displayWarnings(:@results);
@@ -57,8 +59,16 @@ sub displayResults(:@results) {
     }
     
     say "\n$lightSeparator\n";
+    
+    displayStats(:@results);
 
     say $strongSeparator;
+}
+
+sub displayStats(:@results) {
+    my StatisticData $stats = calculateStatistics(:@results);
+
+    
 }
 
 
