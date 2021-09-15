@@ -1,6 +1,8 @@
 unit module DisplayEvaluatedResult;
 
 use ResultAnalyzation;
+use StatisticData;
+use Results;
 
 #enum DisplayMethods <CONSOLE FILE>;
 
@@ -52,13 +54,13 @@ sub askYesNoQuestion($question) returns Bool {
 
 
 sub displayResults(:@results) {
-    say "\nRESULTS:\n";
+    say "\nRESULTS\n";
     
     for @results -> $result {
         say $result.getResultAsString(:$displayWidth);
     }
     
-    say "\n$lightSeparator\n";
+    say "\n$lightSeparator";
     
     displayStats(:@results);
 
@@ -68,14 +70,15 @@ sub displayResults(:@results) {
 sub displayStats(:@results) {
     my StatisticData $stats = calculateStatistics(:@results);
 
-    say $stats.toString(:$displayWidth);
+    say "\nSTATISTICS\n";
+    say $stats.toString(:$displayWidth, :$lineIndent);
 }
 
 
 sub displayWarnings(:@results) {
     return unless $showWarnings;
-    my @allWarnings = getAllWarnings(:@results);
-    return unless @allWarnings;
+    my OkTestResult @allWithWarnings = getAllWithWarnings(:@results);
+    return unless @allWithWarnings;
     
     say "\nWARNINGS\n";
     if ($verbose) {
@@ -83,14 +86,14 @@ sub displayWarnings(:@results) {
         say "Warnings marked with a $symbolForSevereAnswers mean we can't guarantee correct grading for this file. We highly reccommend further examination!\n";
     }
     
-    for @allWarnings -> $result {
+    for @allWithWarnings -> $result {
         say $result.getWarningsAsString(:$symbolForSevereAnswers, :$lineIndent, :$verbose);
     }
 
     say $strongSeparator;
 }
 
-sub getAllWarnings(:@results) {
+sub getAllWithWarnings(:@results) {
     gather {
         for @results -> $result {
             next if (!$result.isOk || !$result.hasWarnings);
@@ -135,7 +138,7 @@ sub displaySummary(:@results) {
     say "\nSUMMARY\n";
     
     say "Evaluated " ~ @results.elems ~ " files.";
-    say "Found " ~ getAllWarnings(:@results).elems ~ " files with warnigns.";
+    say "Found " ~ getAllWithWarnings(:@results).elems ~ " files with warnigns.";
     say "Failed to evaluate " ~ getAllFailures(:@results).elems ~ " files.";
     say "";
     say $strongSeparator;

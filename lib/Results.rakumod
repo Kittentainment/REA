@@ -141,6 +141,7 @@ class TestResult is export {
 #| An OkTestResult means the evaluation succeeded at least partially. Maybe some warnings were thrown, that need to be looked at.
 class OkTestResult is TestResult is export {
     has Int $.score is required;
+    has Int $.maxScore is required;
     has Int $.triedToAnswer is required;
     has WarningInfo @.warnings;
     has Str $.comments;
@@ -155,11 +156,12 @@ class OkTestResult is TestResult is export {
         return True;
     }
 
-    method getResultAsString(:$displayWidth) returns Str {
+    method getResultAsString(:$displayWidth, :$lineIndent = "", :$rightIndentAmmount = 0) returns Str {
         my $string = "";
+        $string ~= $lineIndent;
         $string ~= $.fileName;
         
-        $string ~= '.' x ($displayWidth - $.fileName.chars - 5);
+        $string ~= '.' x ($displayWidth - $lineIndent.chars - $rightIndentAmmount - $.fileName.chars - 5);
         $string ~= sprintf("%02d/%02d", self.score, self.triedToAnswer);
         
         return $string;

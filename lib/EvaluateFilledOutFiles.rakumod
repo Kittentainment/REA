@@ -149,7 +149,7 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
         }
         
     }
-    return OkTestResult.new(:@warnings, :$score, :$triedToAnswer, :$comments, :$fileName)
+    return OkTestResult.new(:@warnings, :$score, maxScore => $parsedMasterFile.QACombos.elems, :$triedToAnswer, :$comments, :$fileName)
 }
 
 
