@@ -18,8 +18,8 @@ ________________________________________________________________________________
 
 1. The name of this class is:
 
-	[ ] Introduction to Perl for Programmers
 	[ ] Introduction to Python for Slytherins
+	[x] Introduction to Perl for Programmers
 	[ ] Introduction to Aussies for Europeans
 	[ ] Introduction to Programming for Pearlers
 	[ ] Introduction to Perl for Programmers and Other Crazy People
@@ -29,21 +29,21 @@ ________________________________________________________________________________
 
 2. The lecturer for this class is:
 
-	[ ] Dr Sigmund Freud
 	[ ] Dr Victor von Doom
-	[ ] Dr Theodor Seuss Geisel
 	[ ] Dr Who
-	[ ] Dr Damian Conway
+	[ ] Dr Theodor Seuss Geisel
+	[x] Dr Damian Conway
+	[ ] Dr Sigmund Freud
 
 
 ________________________________________________________________________________
 
 3. The correct way to answer each question is:
 
-	[ ] To put an X in every box, except the one beside the correct answer
 	[ ] To delete the box beside the correct answer
 	[ ] To put an smiley-face emoji in the box beside the correct answer
-	[ ] To put an X in the box beside the correct answer
+	[ ] To put an X in every box, except the one beside the correct answer
+	[x] To put an X in the box beside the correct answer
 	[ ] To delete the correct answer
 
 

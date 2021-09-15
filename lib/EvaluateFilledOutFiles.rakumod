@@ -38,7 +38,8 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
     return @results;
 }
 
-
+#| Evaluates the parsed File and returns a TestResult with all the result info.
+#| Evaluates the given answers with some inexact matching and tries to find the best match for each answer.
 sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns TestResult {
     my WarningInfo @warnings;
     my Int $score = 0;
@@ -78,6 +79,7 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
         # For every answer in the exam file, find the best matching answer in the master file.
         my Str @filledOutAnswerTexts = $filledOutQACombo.getAllAnswerTexts();
         my Str @masterAnswerTexts = $masterQACombo.getAllAnswerTexts();
+        my Str @matchedFilledOutAnswers;
         my Str @unmatchedFilledOutAnswers;
         my Str @unmatchedMasterAnswers;
         my %masterToFilledOutMatcher; # Matches the text of the master answer to it's matched filled out answer (if a match was found).
@@ -99,10 +101,9 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
                 if (!$shortestDistance.defined || $shortestDistance > $distance) {
                     $shortestDistance = $distance;
                     $bestFoundAnswerIndex = $filledOutAnswerIndex;
-                } elsif ($shortestDistance == $distance) {
-                    # If we want to be fancy, we could check here if there are two best matching answers.
-                    # But that is highly unlikely and our time is probably better spent elsewhere.
                 }
+                # If we found a perfect match, we don't need to check for all the other answers.
+                last GIVEN_ANSWER_TO_COMPARE_TO_LOOP if ($shortestDistance == 0)
             }
     
             unless ($bestFoundAnswerIndex.defined) {
@@ -118,17 +119,27 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
             }
             # Mark the match we found
             %masterToFilledOutMatcher{$masterAnswerText} = $filledOutanswerText;
+            
+            # Mark the filledOutAnswer as matched, so we can later take all the unmatched ones.
+            @matchedFilledOutAnswers.append($filledOutanswerText);
         }
         
+        # Now that we matched all the answer texts, check for the score.
         if ($filledOutQACombo.markedAnswers.elems == 1) {
             $triedToAnswer++;
             # The student gave a valid answer. Now we have to check if it is also correct.
-            my $singleMarkedAnswerText = @filledOutAnswerTexts[0];
+            my $singleMarkedAnswerText = $filledOutQACombo.markedAnswers[0];
             my $correctAnswerText = @masterAnswerTexts[0];
             if (%masterToFilledOutMatcher{$correctAnswerText}
                     && %masterToFilledOutMatcher{$correctAnswerText} eq $singleMarkedAnswerText) {
                 $score++;
             }
+        }
+        
+        # Now find out all the unmatched filledOutAnswers
+        for @filledOutAnswerTexts -> $currentText {
+            next if grep $currentText, @matchedFilledOutAnswers;
+            @unmatchedFilledOutAnswers.append($currentText);
         }
         
         
