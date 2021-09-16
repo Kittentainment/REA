@@ -4,24 +4,22 @@ use Analyzation::ResultAnalyzation;
 use Analyzation::StatisticData;
 use Evaluation::Results;
 
-#enum DisplayMethods <CONSOLE FILE>;
+my Int  constant $displayWidth = 120;
 
-my Int $displayWidth = 120;
-
-my Str $lightSeparator = '-' x $displayWidth;
-my Str $strongSeparator = '=' x $displayWidth;
-my Str $symbolForSevereAnswers = '!';
-my Str $lineIndent = "\t";
-my Bool $verbose = True;
-my Bool $showWarnings = True;
+my Str  constant $lightSeparator = '-' x $displayWidth;
+my Str  constant $strongSeparator = '=' x $displayWidth;
+my Str  constant $symbolForSevereAnswers = '!';
+my Str  constant $lineIndent = "\t";
+my Bool constant $verbose = True;
+my Bool constant $showWarnings = True;
 
 
-sub handleResults(:@results) is export {
+sub displayResults(:@results, :$saveToFile = False) is export {
 
 #    askForWarnings();
 #    askForVerboseOutput();
     
-    displayResults(:@results);
+    displayScoresAndStats(:@results);
     displayWarnings(:@results);
     displayFailures(:@results);
     displaySummary(:@results);
@@ -40,10 +38,10 @@ sub askForVerboseOutput() {
 sub askYesNoQuestion($question) returns Bool {
     for (1) {
         my $answer = prompt($question ~ " [N/Y]");
-        if ($answer ~~ / [Y|y][es]?  /) {
+        if ($answer ~~ / [Y|y][es|ES]?  /) {
             return True;
         }
-        elsif ($answer ~~ /[N|n]o?/) {
+        elsif ($answer ~~ /[N|n][o|O]?/) {
             return False;
         } else {
             say "Please answer with Yes or No (or y or n)!";
@@ -53,7 +51,7 @@ sub askYesNoQuestion($question) returns Bool {
 
 
 
-sub displayResults(:@results) {
+sub displayScoresAndStats(:@results) {
     say "\nRESULTS\n";
     
     for @results -> $result {
