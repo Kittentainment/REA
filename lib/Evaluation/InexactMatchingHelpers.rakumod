@@ -4,7 +4,7 @@ use Text::Levenshtein::Damerau;
 
 
 my Regex @stopWords;
-loadStopWords(filePath => "resources/StopWords.txt");
+loadStopWords(filePath => "lib/Evaluation/StopWords.txt");
 
 sub loadStopWords(:$filePath) {
     for $filePath.IO.lines -> $line {
