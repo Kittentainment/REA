@@ -1,8 +1,8 @@
 unit module DisplayEvaluatedResult;
 
-use ResultAnalyzation;
-use StatisticData;
-use Results;
+use Analyzation::ResultAnalyzation;
+use Analyzation::StatisticData;
+use Evaluation::Results;
 
 #enum DisplayMethods <CONSOLE FILE>;
 

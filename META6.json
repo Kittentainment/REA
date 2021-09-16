@@ -19,7 +19,17 @@
   ],
   "build-depends": [],
   "test-depends": [],
-  "provides": {},
+  "provides": {
+    "Analyzation::ResultAnalyzation": "lib/Analyzation/ResultAnalyzation.pm6",
+    "Analyzation::StatisticData": "lib/Analyzation/StatisticData.pm6",
+    "Evaluation::EvaluateFilledOutFiles": "lib/Evaluation/EvaluateFilledOutFiles.pm6",
+    "Evaluation::InexactMatchingHelpers": "lib/Evaluation/InexactMatchingHelpers.pm6",
+    "Evaluation::Results": "lib/Evaluation/Results.pm6",
+    "Output::DisplayEvaluatedResult": "lib/Output/DisplayEvaluatedResult.pm6",
+    "Output::MasterFileConverter": "lib/Output/MasterFileConverter.pm6",
+    "Parsing::ExamFileGrammar": "lib/Parsing/ExamFileGrammar.pm6",
+    "Parsing::ExamFileParser": "lib/Parsing/ExamFileParser.pm6"
+  },
   "resources": [
     "filled_out_very_short_file_02.txt",
     "master_very_short_file.txt",

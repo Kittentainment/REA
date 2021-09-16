@@ -1,6 +1,6 @@
 unit module MasterFileConverter;
 
-use ExamFileParser;
+use Parsing::ExamFileParser;
 
 my Str $endOfExamMarker = "=" x 80 ~ "\n";
 

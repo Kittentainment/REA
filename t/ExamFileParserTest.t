@@ -1,5 +1,5 @@
 use Test;
-use ExamFileParser;
+use Parsing::ExamFileParser;
 
 #| Parses the given file and checks whether the parsed information matches exactly the given values.
 sub checkParser(:$fileName, :$intro, :@questions, :@markedAnswersList, :@unmarkedAnswersList, :$comments) {

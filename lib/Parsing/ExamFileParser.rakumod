@@ -1,6 +1,6 @@
 unit module ExamFileParser;
 
-use ExamFileGrammar;
+use Parsing::ExamFileGrammar;
 
 
 #| Holds a Question with all its answers.

@@ -1,10 +1,10 @@
 unit module EvaluateFilledOutFiles;
 
 use IO::Glob;
-use ExamFileParser;
-use DisplayEvaluatedResult;
-use Results;
-use InexactMatchingHelpers;
+use Parsing::ExamFileParser;
+use Output::DisplayEvaluatedResult;
+use Evaluation::Results;
+use Evaluation::InexactMatchingHelpers;
 use Text::Levenshtein::Damerau;
 
 

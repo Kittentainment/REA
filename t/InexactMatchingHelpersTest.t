@@ -1,6 +1,6 @@
 use Test;
 
-use InexactMatchingHelpers;
+use Evaluation::InexactMatchingHelpers;
 
 subtest "Test Text Normalization" => {
     {

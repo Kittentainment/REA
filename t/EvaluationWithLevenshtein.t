@@ -1,6 +1,6 @@
 use Test;
-use EvaluateFilledOutFiles;
-use Results;
+use Evaluation::EvaluateFilledOutFiles;
+use Evaluation::Results;
 
 #
 #subtest 'Evaluate Single File' => {

@@ -1,8 +1,8 @@
 #!/usr/bin/env raku -Ilib
-use ExamFileParser;
-use MasterFileConverter;
-use EvaluateFilledOutFiles;
-use DisplayEvaluatedResult;
+use Parsing::ExamFileParser;
+use Output::MasterFileConverter;
+use Evaluation::EvaluateFilledOutFiles;
+use Output::DisplayEvaluatedResult;
 
 #| REA (Raku Exam Automation) Takes two arguments:
 #| - which command shall be executed

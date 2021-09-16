@@ -1,7 +1,7 @@
 unit module ResultAnalyzation;
 
-use Results;
-use StatisticData;
+use Evaluation::Results;
+use Analyzation::StatisticData;
 
 #| Calculates all the important statistic for our Results
 #| No existing module calculated the exact things we needed, so we just calculated it ourself.

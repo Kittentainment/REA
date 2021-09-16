@@ -1,6 +1,6 @@
 unit class StatisticData;
 
-use Results;
+use Evaluation::Results;
 
 has Num $.averageScore is required;
 has Int $.minScore is required;
