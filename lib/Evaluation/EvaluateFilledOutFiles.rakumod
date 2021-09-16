@@ -7,7 +7,8 @@ use Evaluation::Results;
 use Evaluation::InexactMatchingHelpers;
 use Text::Levenshtein::Damerau;
 
-
+my Bool $verbose = False;
+my Bool $debugging = False;
 
 sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
     my EFParser $parsedMasterFile = EFParser
@@ -28,7 +29,9 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
                         }
                     }
                 }
+                say "Evaluating file {$parsedFilledOutFile.fileName}" if $verbose;
                 take evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile);
+                say "...Evaluation done" if $debugging;
             }
         }
     }
@@ -40,7 +43,8 @@ sub evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames) is export {
 
 #| Evaluates the parsed File and returns a TestResult with all the result info.
 #| Evaluates the given answers with some inexact matching and tries to find the best match for each answer.
-sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns TestResult {
+sub evaluateFilledOutFile(:$parsedMasterFile, EFParser :$parsedFilledOutFile) returns TestResult {
+    
     my WarningInfo @warnings;
     my Int $score = 0;
     my Int $triedToAnswer = 0;
@@ -53,6 +57,7 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
     }
     
     for ^$parsedMasterFile.QACombos -> $QAComboIndex {
+        say "Comparing answer number {$QAComboIndex + 1}" if $debugging;
         # If there is no question from the student file, some questions might have gone missing.
         unless ($parsedFilledOutFile.QACombos[$QAComboIndex]) {
             my Int $actualQuestionCount = $parsedFilledOutFile.QACombos.elems;
@@ -91,19 +96,31 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
     
             my Int $shortestDistance;
             my Int $bestFoundAnswerIndex;
-    
-            GIVEN_ANSWER_TO_COMPARE_TO_LOOP:
+
+            # First check if any answer matches exactly, so we don't have to use the slow Levenshtein for all the non-matching answers. (Extreme performance boost)
+            EXACT_MATCHING_TEST:
             for ^@filledOutAnswerTexts -> $filledOutAnswerIndex {
                 my Str $filledOutAnswerText = @filledOutAnswerTexts[$filledOutAnswerIndex];
-                my Int $distance = dld(normalizeText($masterAnswerText), normalizeText($filledOutAnswerText));
-                next unless (isGivenDistanceOK(:$distance, expectedText => $masterAnswerText));
-                # ignore if it's not at least similar.
-                if (!$shortestDistance.defined || $shortestDistance > $distance) {
-                    $shortestDistance = $distance;
+                if ($filledOutAnswerText eq $masterAnswerText) {
+                    $shortestDistance = 0;
                     $bestFoundAnswerIndex = $filledOutAnswerIndex;
+                    last EXACT_MATCHING_TEST;
                 }
-                # If we found a perfect match, we don't need to check for all the other answers.
-                last GIVEN_ANSWER_TO_COMPARE_TO_LOOP if ($shortestDistance == 0)
+            }
+            
+            unless ($shortestDistance.defined) {
+                # If we didn't find an exact match, try to find one with the Levenshtein-Damerau Algorithm.
+                GIVEN_ANSWER_TO_COMPARE_TO_LOOP:
+                for ^@filledOutAnswerTexts -> $filledOutAnswerIndex {
+                    my Str $filledOutAnswerText = @filledOutAnswerTexts[$filledOutAnswerIndex];
+                    my Int $distance = dld(normalizeText($masterAnswerText), normalizeText($filledOutAnswerText));
+                    next unless (isGivenDistanceOK(:$distance, expectedText => $masterAnswerText));
+                    # ignore if it's not at least similar.
+                    if (!$shortestDistance.defined || $shortestDistance > $distance) {
+                        $shortestDistance = $distance;
+                        $bestFoundAnswerIndex = $filledOutAnswerIndex;
+                    }
+                }
             }
     
             unless ($bestFoundAnswerIndex.defined) {
