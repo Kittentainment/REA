@@ -34,6 +34,12 @@ class WarningInfo is export {
     has Str @.expectedAnswerTexts;
     has Str @.actualAnswerTexts;
     
+    #| Just returns the questionNumber + 1, so that the first question is 1, not 0.
+    #| Because we use this very often when displaying it and it's easier to find a piece of code we forgot to add 1 if it's a separate method.
+    method questionNumberStartingWith1() {
+        return $!questionNumber + 1;
+    }
+    
     #| True if we are not entirely sure if our grading was correctly parsed.
     method isSevere() returns Bool {
         return True if ($!warning ~~ /Error/);
@@ -56,7 +62,8 @@ class WarningInfo is export {
             }
             when ANSWER_MISMATCH {
                 my Str $string = $lineIndent;
-                $string ~= $!warning.Str ~ " - The following answers were assumed to be the same for question $!questionNumber:\n";
+                $string ~= $!warning
+                        .Str ~ " - The following answers were assumed to be the same for question {self.questionNumberStartingWith1}:\n";
                 $string ~= $lineIndent x 2 ~ "expected: $!expectedAnswerText\n";
                 $string ~= $lineIndent x 2 ~ "actual:   $!actualAnswerText\n";
                 return $string;
@@ -69,18 +76,19 @@ class WarningInfo is export {
             }
             when ANSWER_MISMATCH_ERROR {
                 my Str $string = $lineIndent ~ $symbolForSevereAnswers;
-                if (@!actualAnswerTexts.elems == 0) {# yes this could be made simpler, but it's clearer that way.
+                if (@!actualAnswerTexts.elems == 0) {
+                    # yes this could be made simpler, but it's clearer that way.
                     # Too many expected answers -> answers missing
-                    $string ~= "Answers Missing - The following answers were not present for question $!questionNumber:\n";
+                    $string ~= "Answers Missing - The following answers were not present for question {self.questionNumberStartingWith1}:\n";
                     $string ~= self!listAllAnswers(answerList => @!expectedAnswerTexts, lineIndent => $lineIndent x 3);
                 }
                 elsif (@!expectedAnswerTexts.elems == 0) {
                     # Too many given answers -> new ones were added. Maybe the master file had no correct answer?
-                    $string ~= "Too Many Answers - The following answers were added for question $!questionNumber:\n";
+                    $string ~= "Too Many Answers - The following answers were added for question {self.questionNumberStartingWith1}:\n";
                     $string ~= self!listAllAnswers(answerList => @!actualAnswerTexts, lineIndent => $lineIndent x 3);
                 }
                 else {
-                    $string ~= "Answer Mismatch - Some answers don't match the ones from the exam file on question $!questionNumber.\n";
+                    $string ~= "Answer Mismatch - Some answers don't match the ones from the exam file on question {self.questionNumberStartingWith1}.\n";
                     $string ~= ($lineIndent x 2) ~ "Expected:\n";
                     $string ~= self!listAllAnswers(answerList => @!expectedAnswerTexts, lineIndent => $lineIndent x 3);
                     $string ~= ($lineIndent x 2) ~ "Actual:\n";
