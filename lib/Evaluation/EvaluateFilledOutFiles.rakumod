@@ -95,7 +95,7 @@ sub evaluateFilledOutFile(:$parsedMasterFile, :$parsedFilledOutFile) returns Tes
             GIVEN_ANSWER_TO_COMPARE_TO_LOOP:
             for ^@filledOutAnswerTexts -> $filledOutAnswerIndex {
                 my Str $filledOutAnswerText = @filledOutAnswerTexts[$filledOutAnswerIndex];
-                my Int $distance = dld($masterAnswerText, $filledOutAnswerText);
+                my Int $distance = dld(normalizeText($masterAnswerText), normalizeText($filledOutAnswerText));
                 next unless (isGivenDistanceOK(:$distance, expectedText => $masterAnswerText));
                 # ignore if it's not at least similar.
                 if (!$shortestDistance.defined || $shortestDistance > $distance) {
