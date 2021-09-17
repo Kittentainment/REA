@@ -6,7 +6,7 @@ use Analyzation::StatisticData;
 #| Calculates all the important statistic for our Results
 #| No existing module calculated the exact things we needed, so we just calculated it ourself.
 sub calculateStatistics(:@results) returns StatisticData is export {
-    
+
     my Int @allScores;
     my Int @allTries;
 
@@ -16,7 +16,7 @@ sub calculateStatistics(:@results) returns StatisticData is export {
         @allScores.append($result.score);
         @allTries.append($result.triedToAnswer);
     }
-    
+
     # Calculate the basic Values
     my Num $averageScore = calcAverage(@allScores);
     my Int @minMaxScore = calcMinMax(@allScores);
@@ -37,7 +37,7 @@ sub calculateStatistics(:@results) returns StatisticData is export {
     }
 
     my %worstAnsweredQuestions = getWorstAnsweredQuestions(:@results);
-    
+
     getPossibleCheaters(:@results);
 
     return StatisticData.new(
@@ -55,7 +55,7 @@ sub calculateStatistics(:@results) returns StatisticData is export {
             :@skipped75percQuestions,
             :%worstAnsweredQuestions,
             )
-    
+
 }
 
 #| Calculates the average of the given data
@@ -71,7 +71,7 @@ sub calcMinMax(Int @data) returns List {
     my $minCount;
     my $max;
     my $maxCount;
-    
+
     for @data -> $entry {
         if (!$min.defined || $entry < $min) {
             $min = $entry;
@@ -94,15 +94,16 @@ sub calcMinMax(Int @data) returns List {
 sub getWorstAnsweredQuestions(:@results, :$worstQuestionCount = 3) returns Hash {
     # Stores for each question number the count of wrong answers
     my Int @numberOfWrongAnswersPerQuestion;
-    
+
     say "result count: " ~ @results.elems;
     for @results -> $result {
         next unless $result.isOk();
-        die "Somehow the filledOutAnsersIndexedByMasterfile has a different count than the correctMasterAnswerIndexes! This should never happen. Please contact the devs." unless $result.filledOutAnsersIndexedByMasterfile.elems == $result.correctMasterAnswerIndexes.elems;
+        die "Somehow the filledOutAnsersIndexedByMasterfile has a different count than the correctMasterAnswerIndexes! This should never happen. Please contact the devs." unless $result
+                .filledOutAnsersIndexedByMasterfile.elems == $result.correctMasterAnswerIndexes.elems;
         for ^$result.filledOutAnsersIndexedByMasterfile -> $index {
             if (!$result.filledOutAnsersIndexedByMasterfile[$index].defined
                     || $result.filledOutAnsersIndexedByMasterfile[$index]
-                        != $result.correctMasterAnswerIndexes[$index] ) {
+                    != $result.correctMasterAnswerIndexes[$index]) {
                 if (@numberOfWrongAnswersPerQuestion[$index]) {
                     @numberOfWrongAnswersPerQuestion[$index]++;
                 } else {
@@ -114,22 +115,22 @@ sub getWorstAnsweredQuestions(:@results, :$worstQuestionCount = 3) returns Hash 
     say @numberOfWrongAnswersPerQuestion;
     say @numberOfWrongAnswersPerQuestion.elems;
     say "";
-    
+
     # Maps the worst question numbers (keys) to their number of wrong answers (values)
     my %worstQuestionIndexes;
-    
+
     # Now check which $worstQuestionCount questions have the highest wrong answers:
     for ^@numberOfWrongAnswersPerQuestion -> $iteratorIndex {
         say "current Index = $iteratorIndex";
         my Int $numberOfWrongAnswersToBeChecked = @numberOfWrongAnswersPerQuestion[$iteratorIndex];
-        
+
         if (%worstQuestionIndexes.keys.elems < $worstQuestionCount) {
             # If we have fewer than the required questions, just add it (= adds the first $worstQuestionCount indexes)
             %worstQuestionIndexes{$iteratorIndex} = $numberOfWrongAnswersToBeChecked;
             say $iteratorIndex;
             next;
         }
-        
+
         # We take the key from %worstQuestionIndexes with the lowest corresponding value.
         # Either this one gets replaced, or none at all.
         say %worstQuestionIndexes;
@@ -140,26 +141,31 @@ sub getWorstAnsweredQuestions(:@results, :$worstQuestionCount = 3) returns Hash 
             %worstQuestionIndexes{$iteratorIndex} = $numberOfWrongAnswersToBeChecked;
         }
     }
-    
+
     return %worstQuestionIndexes;
-    
+
 }
 
 #| Returns all probable cheating pairs and their calculated probability
 #| In the form ($resultA, $resultB, $prob)
-sub getPossibleCheaters(:@results, :$threshold = 0.5) {
+sub getPossibleCheaters(:@results, :$probabilityThreshold = 0.5, :$wrongQuestionThreshold = 3,
+                        :$numberOfPossibleAnswers = 5) {
+    # filter out all results, that disqualify because they have enough correct answers
+    my @filteredResults = @results.grep(-> $result {
+        $result.isOk() && ($result.maxScore - $result.score) <= $wrongQuestionThreshold
+    });
     return gather {
-        for ^@results -> $resultAIndex {
-            my TestResult $resultA = @results[$resultAIndex];
+        for ^@filteredResults -> $resultAIndex {
+            my TestResult $resultA = @filteredResults[$resultAIndex];
             next unless ($resultA.isOk);
-            
-            for ($resultAIndex + 1)..@results -> $resultBIndex {
-                my TestResult $resultB = @results[$resultBIndex];
+
+            for ($resultAIndex + 1) .. @filteredResults -> $resultBIndex {
+                my TestResult $resultB = @filteredResults[$resultBIndex];
                 next unless ($resultB.isOk);
                 #next unless $resultA.isSame($resultB); # Not necessary as we start at $resultAIndex + 1
-                
+
                 my $prob = getCheatingProbability(:$resultA, :$resultB);
-                if ($prob >= $threshold) {
+                if ($prob >= $probabilityThreshold) {
                     take ($resultA, $resultB, $prob);
                 }
             }
@@ -168,7 +174,13 @@ sub getPossibleCheaters(:@results, :$threshold = 0.5) {
 }
 
 
-sub getCheatingProbability(:$resultA, :$resultB) {
-    
+sub getCheatingProbability(:$resultA, :$resultB, :$numberOfPossibleAnswers) {
+    # as a base metric we take the probability of such a match based on randomly choosing the wrong answers.
+    # but since not every question is as reasonable as the others, we need to adjust a little
+    my Int $numberOfWrongAnswersA;
+    my Int $numberOfWrongAnswersB;
+    my Int $numberOfWrongAnswersInCommon;
 
+
+    #chance of a specific wrong answer: 1/($numberOfPossibleAnswers-1)
 }
