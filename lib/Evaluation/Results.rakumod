@@ -144,6 +144,10 @@ class TestResult is export {
 
     method getResultAsString(:$displayWidth) returns Str {...}
     
+    method isSame(TestResult $otherResult) returns Bool {
+        return $otherResult.fileName eq self.fileName;
+    }
+    
 }
 
 #| An OkTestResult means the evaluation succeeded at least partially. Maybe some warnings were thrown, that need to be looked at.

@@ -37,6 +37,8 @@ sub calculateStatistics(:@results) returns StatisticData is export {
     }
 
     my %worstAnsweredQuestions = getWorstAnsweredQuestions(:@results);
+    
+    getPossibleCheaters(:@results);
 
     return StatisticData.new(
             :$averageScore,
@@ -141,4 +143,32 @@ sub getWorstAnsweredQuestions(:@results, :$worstQuestionCount = 3) returns Hash 
     
     return %worstQuestionIndexes;
     
+}
+
+#| Returns all probable cheating pairs and their calculated probability
+#| In the form ($resultA, $resultB, $prob)
+sub getPossibleCheaters(:@results, :$threshold = 0.5) {
+    return gather {
+        for ^@results -> $resultAIndex {
+            my TestResult $resultA = @results[$resultAIndex];
+            next unless ($resultA.isOk);
+            
+            for ($resultAIndex + 1)..@results -> $resultBIndex {
+                my TestResult $resultB = @results[$resultBIndex];
+                next unless ($resultB.isOk);
+                #next unless $resultA.isSame($resultB); # Not necessary as we start at $resultAIndex + 1
+                
+                my $prob = getCheatingProbability(:$resultA, :$resultB);
+                if ($prob >= $threshold) {
+                    take ($resultA, $resultB, $prob);
+                }
+            }
+        }
+    }
+}
+
+
+sub getCheatingProbability(:$resultA, :$resultB) {
+    
+
 }
