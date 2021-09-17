@@ -38,11 +38,7 @@ sub calculateStatistics(:@results) returns StatisticData is export {
 
     my %worstAnsweredQuestions = getWorstAnsweredQuestions(:@results);
 
-    my List @allPossibleCheaters = getPossibleCheaters(:@results, worstAnsweredQuestionIndexes => %worstAnsweredQuestions.keys);
-    say @allPossibleCheaters[0][0];
-    say @allPossibleCheaters[0][1];
-    say @allPossibleCheaters[0][2];
-    say @allPossibleCheaters.elems;
+#    my List @allPossibleCheaters = getPossibleCheaters(:@results, worstAnsweredQuestionIndexes => %worstAnsweredQuestions.keys);
 
     return StatisticData.new(
             :$averageScore,
@@ -99,7 +95,7 @@ sub getWorstAnsweredQuestions(:@results, :$worstQuestionCount = 3) returns Hash 
     # Stores for each question number the count of wrong answers
     my Int @numberOfWrongAnswersPerQuestion;
 
-    say "result count: " ~ @results.elems;
+#    say "result count: " ~ @results.elems;
     for @results -> $result {
         next unless $result.isOk();
         die "Somehow the filledOutAnsersIndexedByMasterfile has a different count than the correctMasterAnswerIndexes! This should never happen. Please contact the devs." unless $result
@@ -116,28 +112,23 @@ sub getWorstAnsweredQuestions(:@results, :$worstQuestionCount = 3) returns Hash 
             }
         }
     }
-    say @numberOfWrongAnswersPerQuestion;
-    say @numberOfWrongAnswersPerQuestion.elems;
-    say "";
-
+    
     # Maps the worst question numbers (keys) to their number of wrong answers (values)
     my %worstQuestionIndexes;
 
     # Now check which $worstQuestionCount questions have the highest wrong answers:
     for ^@numberOfWrongAnswersPerQuestion -> $iteratorIndex {
-        say "current Index = $iteratorIndex";
+#        say "current Index = $iteratorIndex";
         my Int $numberOfWrongAnswersToBeChecked = @numberOfWrongAnswersPerQuestion[$iteratorIndex];
 
         if (%worstQuestionIndexes.keys.elems < $worstQuestionCount) {
             # If we have fewer than the required questions, just add it (= adds the first $worstQuestionCount indexes)
             %worstQuestionIndexes{$iteratorIndex} = $numberOfWrongAnswersToBeChecked;
-            say $iteratorIndex;
             next;
         }
 
         # We take the key from %worstQuestionIndexes with the lowest corresponding value.
         # Either this one gets replaced, or none at all.
-        say %worstQuestionIndexes;
         my Str $keyWithTheLowestValue = (%worstQuestionIndexes.sort: *.value)[0].key;
         if (%worstQuestionIndexes{$keyWithTheLowestValue} < $numberOfWrongAnswersToBeChecked) {
             # We found a worse answered Question. Replace the best of the already found worst answered questions.
@@ -158,7 +149,7 @@ sub getPossibleCheaters(:@results, :@worstAnsweredQuestionIndexes, :$probability
     my @filteredResults = @results.grep(-> $result {
         $result.isOk() && ($result.maxScore - $result.score) >= $wrongQuestionThreshold
     });
-    say "Number of filtered elements" ~ @filteredResults.elems;
+#    say "Number of filtered elements" ~ @filteredResults.elems;
     return gather {
         for ^@filteredResults -> $resultAIndex {
             my TestResult $resultA = @filteredResults[$resultAIndex];
@@ -194,7 +185,7 @@ sub getCheatingProbability(:$resultA, :$resultB, :$numberOfAnswersPerQuestion, :
     # Evaluate all the questions
     for ^$questionCount -> $questionNumber {
         if (!$resultA.filledOutAnsersIndexedByMasterfile[$questionNumber].defined || !$resultB.filledOutAnsersIndexedByMasterfile[$questionNumber].defined) {
-            say "$questionNumber: undefined.";
+#            say "$questionNumber: undefined.";
             # At least one of the students didn't answer the question.
             # Check if one answered and therefore they have different answers which indicates less cheating probability.
             if (!$resultA.filledOutAnsersIndexedByMasterfile[$questionNumber].defined && !$resultB.filledOutAnsersIndexedByMasterfile[$questionNumber].defined) {
@@ -209,12 +200,12 @@ sub getCheatingProbability(:$resultA, :$resultB, :$numberOfAnswersPerQuestion, :
         if ($resultA.filledOutAnsersIndexedByMasterfile[$questionNumber] == $resultA.correctMasterAnswerIndexes[$questionNumber]
                 && $resultB.filledOutAnsersIndexedByMasterfile[$questionNumber] == $resultB.correctMasterAnswerIndexes[$questionNumber]) {
             # Skip if both answers are correct.
-            say "$questionNumber: answered correctly.";
+#            say "$questionNumber: answered correctly.";
             next;
         }
         if ($resultA.filledOutAnsersIndexedByMasterfile[$questionNumber] != $resultB.filledOutAnsersIndexedByMasterfile[$questionNumber]) {
             # This question lowers the probability that they cheated, as they answered differently.
-            say "$questionNumber: answered differently: A={$resultA.filledOutAnsersIndexedByMasterfile[$questionNumber]}; B={$resultB.filledOutAnsersIndexedByMasterfile[$questionNumber]}";
+#            say "$questionNumber: answered differently: A={$resultA.filledOutAnsersIndexedByMasterfile[$questionNumber]}; B={$resultB.filledOutAnsersIndexedByMasterfile[$questionNumber]}";
             $numberOfDifferentAnswers++;
             next;
         }
@@ -222,10 +213,10 @@ sub getCheatingProbability(:$resultA, :$resultB, :$numberOfAnswersPerQuestion, :
         # => This question was answered the same wrong way.
         unless ($questionNumber (elem) @worstAnsweredQuestionIndexes.Set) {
             # This question was among the hardest three questions.It's ok if they both answered the same wrong way.
-            say "skipping worstAnsweredQuestionIndexes";
+#            say "skipping worstAnsweredQuestionIndexes";
             next;
         }
-        say "found a $numberOfWrongAnswersInCommon";
+#        say "found a $numberOfWrongAnswersInCommon";
         $numberOfWrongAnswersInCommon++;
     }
     
@@ -238,17 +229,17 @@ sub getCheatingProbability(:$resultA, :$resultB, :$numberOfAnswersPerQuestion, :
     my $K = $numberOfWrongAnswersInCommon;
     my $n = $significantQuestionsCount;
     
-    say "K: $K";
+#    say "K: $K";
     # probability that we have at least the amount of $numberOfWrongAnswersInCommon
     my $probability = 0;
     for ^$K -> $k {
-        say "loop $k";
+#        say "loop $k";
         $probability += ($n! / ($k! * ($n-$k)! )) * $p ** $k * (1 - $p) ** ($n - $k);
     }
     # From https://www.mathelike.de/abi-check-mathe-abi-skript-bayern/3-stochastik/3-2-urnenmodelle/3-2-2-berechnung-von-wahrscheinlichkeiten.html?dt=1631897757708
     
     
-    say $probability;
+#    say $probability;
     #chance of a specific wrong answer: 1/($numberOfPossibleAnswers-1)
     return $probability;
 }
