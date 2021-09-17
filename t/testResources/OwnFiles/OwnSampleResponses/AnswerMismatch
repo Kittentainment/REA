@@ -107,7 +107,7 @@ ________________________________________________________________________________
 
 9. The term qq{XXXXX} is...
 
-    [X] ...another way of writing the double-quoted string: "XXXXX"
+    [X] ...another way of writng double-quoted string: "XXXXX"
     [ ] ...another way of writing the single-quoted string: 'XXXXX'
     [ ] ...another way of writing the list of strings:  ('X', 'X', 'X', 'X', 'X')
     [ ] ...another way of writing the array of strings: ['X', 'X', 'X', 'X', 'X']
@@ -175,7 +175,7 @@ ________________________________________________________________________________
 
     [X] ...once per element in the list, unless a 'last' is executed in the block
     [ ] ...once per element in the list in all circumstances
-    [ ] ...endlessly, until a 'last' is executed in the loop
+    [ ] ...endlessly, until 'last' is executed in the loop
     [ ] ...an unknown number of times, until the list being iterated is empty
     [ ] ...never, because an array is not a list and cannot be iterated
 

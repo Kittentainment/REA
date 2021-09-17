@@ -1,11 +1,10 @@
 unit module ExamFileParser;
 
-use ExamFileGrammar;
+use Parsing::ExamFileGrammar;
 
-#|{
-Holds a Question with all its answers.
-Stores the answers separately, whether they were marked or not.
-}
+
+#| Holds a Question with all its answers.
+#| Stores the answers separately, whether they were marked or not.
 class QACombo is export {
     has Str $.question is required;
     has Str @.markedAnswers is required;
@@ -26,12 +25,13 @@ class EFParser is export {
     has Str $.separator;
     has QACombo @.QACombos;
     has Str $.endOfExamText;
-    has Str $.Comments;
+    has Str $.comments;
     
     submethod BUILD(
             :$!fileName,
             :$!separator = '_' x 80,
-            :$!endOfExamText = " " x 34 ~ "END OF EXAM") {
+            :$!endOfExamText = " " x 34 ~ "END OF EXAM")
+    {
         unless ($!fileName.IO.e && $!fileName.IO.r) {
             die "File doesn't exist";
             # TODO better file error handling
@@ -48,7 +48,7 @@ class EFParser is export {
         $!intro = $parseTree{"intro"}.Str;
         
         for $parseTree{"QACombo"} -> $qaComboParseTree {
-            my Str $question = ($qaComboParseTree{"question"}.?Str.trim-trailing // "");
+            my Str $question = ($qaComboParseTree{"question"} // "").Str.trim-trailing;
             my Match $answers = $qaComboParseTree{"answers"};
             my Str @markedAnswers;
             my Str @unmarkedAnswers;
@@ -62,7 +62,7 @@ class EFParser is export {
             }
             @!QACombos.append(QACombo.new(:$question, :@markedAnswers, :@unmarkedAnswers));
         }
-        $!Comments = ($parseTree{"comments"}.?Str // "") ;
+        $!comments = ($parseTree{"comments"} // "").Str ;
     }
 }
 

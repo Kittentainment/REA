@@ -1,0 +1,52 @@
+Complete this exam by placing an 'X' in the box beside each correct
+answer, like so:
+
+    [ ] This is not the correct answer
+    [ ] This is not the correct answer either
+    [ ] This is an incorrect answer
+    [X] This is the correct answer
+    [ ] This is an irrelevant answer
+
+Scoring: Each question is worth 2 points.
+         Final score will be: SUM / 10
+
+Warning: Each question has only one correct answer. Answers to
+         questions for which two or more boxes are marked with an 'X'
+         will be scored as zero.
+
+________________________________________________________________________________
+
+1. The name of this class is:
+
+	[ ] Introduction to Aussies for Europeans
+	[ ] Introduction to Python for Slytherins
+	[x] Introduction to Perl for Programmers
+	[ ] Introduction to Perl for Programmers and Other Crazy People
+	[ ] Introduction to Programming for Pearlers
+
+
+________________________________________________________________________________
+
+2. The lecturer for this class is:
+
+	[ ] Dr Sigmund Freud which was a very sexist person with daddy issues :)
+	[ ] Dr Theodor Seuss Geissel
+	[x] Dr Who
+	[ ] Dr Damian Conway
+	[ ] Dr Victor von Doom
+
+
+________________________________________________________________________________
+
+3. The correct way to answer each question is:
+
+	[ ]         put  smiley-face emoji :)   box besidecorrect answer
+	[ ] To delete the correct answer
+	[ ] To put an X in every box, except the one beside the correct answer
+	[ ] To delete the box beside the correct answer
+	[x] To put an X in the box beside the correct answer
+
+
+================================================================================
+                                  END OF EXAM
+================================================================================

@@ -1,16 +1,20 @@
-#!/usr/bin/env raku
-use ExamFileParser;
-use MasterFileConverter;
-#|{ REA (Raku Exam Automation) Takes two arguments:
-#| - which command shall be executed
-#| - the name of the MasterFile
-}
-sub MAIN($command, $masterFileName) {
-    if ($command eq "create") {
+#!/usr/bin/env raku -Ilib
+use Parsing::ExamFileParser;
+use Output::MasterFileConverter;
+use Evaluation::EvaluateFilledOutFiles;
+use Output::DisplayEvaluatedResult;
+
+#| REA (Raku Exam Automation) Takes the following arguments:
+#| - Which command shall be executed
+#| - The name of the MasterFile
+#| - A list of all the files that should be evaluated (ignored if the command is not evaluate)
+sub MAIN($command, $masterFileName, *@filledOutFileNames) {
+    if ($command ~~ /c[reate]?/) {
         createTestsFromMasterFile(:$masterFileName, count => 1);
     }
-    elsif($command eq "evaluate") {
-        # TODO
+    elsif($command ~~ /e[val[uate]?]?/) {
+        my @results = evaluateFilledOutFiles(:$masterFileName, :@filledOutFileNames);
+        displayResults(:@results);
     }
     elsif ($command ~~ /'-'h|help/) {
         showHelp();

@@ -1,0 +1,27 @@
+
+This Is the Intro line 1
+Intro line 2
+
+________________________________________________________________________________
+
+
+1. The name of this class is:
+
+	[x] Introduction to Perl for Programmers
+	[ ] Introduction to Perl for Programmers and Other Crazy People
+
+________________________________________________________________________________
+
+
+3. The correct way to answer each question is:
+
+	[ ] To put an X in the box beside the correct answer
+	[x] To put an X in every box, except the one beside the correct answer
+
+================================================================================
+                                  END OF EXAM
+================================================================================
+
+this is a comment from file 02
+
+another comment from file 02

@@ -1,6 +1,6 @@
 use Test;
-use MasterFileConverter;
-use ExamFileParser;
+use Output::MasterFileConverter;
+use Parsing::ExamFileParser;
 use IO::Glob;
 
 subtest 'General Layout Test' => {
