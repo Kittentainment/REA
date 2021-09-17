@@ -36,6 +36,8 @@ sub calculateStatistics(:@results) returns StatisticData is export {
         }
     }
 
+    my %worstAnsweredQuestions = getWorstAnsweredQuestions(:@results);
+
     return StatisticData.new(
             :$averageScore,
             minScore => @minMaxScore[0],
@@ -48,7 +50,8 @@ sub calculateStatistics(:@results) returns StatisticData is export {
             maxTries => @minMaxTries[2],
             maxTriesCount => @minMaxTries[3],
             :@scoreBelow50perc,
-            :@skipped75percQuestions
+            :@skipped75percQuestions,
+            :%worstAnsweredQuestions,
             )
     
 }
@@ -84,4 +87,58 @@ sub calcMinMax(Int @data) returns List {
     return ($min, $minCount, $max, $maxCount);
 }
 
-
+#| Gets the $count worst answered questions in the given results.
+#| Returns a Hash with keys as question numbers and values as number of wrong answers.
+sub getWorstAnsweredQuestions(:@results, :$worstQuestionCount = 3) returns Hash {
+    # Stores for each question number the count of wrong answers
+    my Int @numberOfWrongAnswersPerQuestion;
+    
+    say "result count: " ~ @results.elems;
+    for @results -> $result {
+        next unless $result.isOk();
+        die "Somehow the filledOutAnsersIndexedByMasterfile has a different count than the correctMasterAnswerIndexes! This should never happen. Please contact the devs." unless $result.filledOutAnsersIndexedByMasterfile.elems == $result.correctMasterAnswerIndexes.elems;
+        for ^$result.filledOutAnsersIndexedByMasterfile -> $index {
+            if (!$result.filledOutAnsersIndexedByMasterfile[$index].defined
+                    || $result.filledOutAnsersIndexedByMasterfile[$index]
+                        != $result.correctMasterAnswerIndexes[$index] ) {
+                if (@numberOfWrongAnswersPerQuestion[$index]) {
+                    @numberOfWrongAnswersPerQuestion[$index]++;
+                } else {
+                    @numberOfWrongAnswersPerQuestion[$index] = 1;
+                }
+            }
+        }
+    }
+    say @numberOfWrongAnswersPerQuestion;
+    say @numberOfWrongAnswersPerQuestion.elems;
+    say "";
+    
+    # Maps the worst question numbers (keys) to their number of wrong answers (values)
+    my %worstQuestionIndexes;
+    
+    # Now check which $worstQuestionCount questions have the highest wrong answers:
+    for ^@numberOfWrongAnswersPerQuestion -> $iteratorIndex {
+        say "current Index = $iteratorIndex";
+        my Int $numberOfWrongAnswersToBeChecked = @numberOfWrongAnswersPerQuestion[$iteratorIndex];
+        
+        if (%worstQuestionIndexes.keys.elems < $worstQuestionCount) {
+            # If we have fewer than the required questions, just add it (= adds the first $worstQuestionCount indexes)
+            %worstQuestionIndexes{$iteratorIndex} = $numberOfWrongAnswersToBeChecked;
+            say $iteratorIndex;
+            next;
+        }
+        
+        # We take the key from %worstQuestionIndexes with the lowest corresponding value.
+        # Either this one gets replaced, or none at all.
+        say %worstQuestionIndexes;
+        my Str $keyWithTheLowestValue = (%worstQuestionIndexes.sort: *.value)[0].key;
+        if (%worstQuestionIndexes{$keyWithTheLowestValue} < $numberOfWrongAnswersToBeChecked) {
+            # We found a worse answered Question. Replace the best of the already found worst answered questions.
+            %worstQuestionIndexes{$keyWithTheLowestValue}:delete;
+            %worstQuestionIndexes{$iteratorIndex} = $numberOfWrongAnswersToBeChecked;
+        }
+    }
+    
+    return %worstQuestionIndexes;
+    
+}

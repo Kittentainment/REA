@@ -151,6 +151,8 @@ class OkTestResult is TestResult is export {
     has Int $.score is required;
     has Int $.maxScore is required;
     has Int $.triedToAnswer is required;
+    has Int @.filledOutAnsersIndexedByMasterfile is required;
+    has Int @.correctMasterAnswerIndexes is required;
     has WarningInfo @.warnings;
     has Str $.comments;
     

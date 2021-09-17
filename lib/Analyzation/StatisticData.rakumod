@@ -2,16 +2,17 @@ unit class StatisticData;
 
 use Evaluation::Results;
 
-has Num $.averageScore is required;
-has Int $.minScore is required;
-has Int $.minScoreCount is required;
-has Int $.maxScore is required;
-has Int $.maxScoreCount is required;
-has Num $.averageTries is required;
-has Int $.minTries is required;
-has Int $.minTriesCount is required;
-has Int $.maxTries is required;
-has Int $.maxTriesCount is required;
+has Num  $.averageScore is required;
+has Int  $.minScore is required;
+has Int  $.minScoreCount is required;
+has Int  $.maxScore is required;
+has Int  $.maxScoreCount is required;
+has Num  $.averageTries is required;
+has Int  $.minTries is required;
+has Int  $.minTriesCount is required;
+has Int  $.maxTries is required;
+has Int  $.maxTriesCount is required;
+has Int  %.worstAnsweredQuestions is required;
 
 # tests below expectation
 has TestResult @.scoreBelow50perc is required;
@@ -49,6 +50,9 @@ method toString(:$displayWidth, :$lineIndent) returns Str {
     
     $outputString ~= "\n";
     $outputString ~= self!getBlockOfBelowExpectations(:$displayWidth, :$resultLength, :$lineIndent);
+    
+    $outputString ~= "\n";
+    $outputString ~= self!getWorstQuestionBlock(:$displayWidth, :$resultLength, :$lineIndent);
     
     return $outputString;
 }
@@ -100,6 +104,21 @@ method !getBlockOfBelowExpectations(:$displayWidth, :$resultLength, :$lineIndent
     for @!skipped75percQuestions -> $result {
         $outputString ~= $result.getResultAsString(:$displayWidth, :$lineIndent, rightIndentAmmount => $resultLength);
         $outputString ~= "  (Skipped > 25%)\n";
+    }
+    
+    return $outputString;
+}
+
+#| Displays which questions have been answered the worst.
+method !getWorstQuestionBlock(:$displayWidth, :$resultLength, :$lineIndent) {
+    my Str $outputString;
+    
+    $outputString ~= "Most difficult questions:\n";
+    for (%!worstAnsweredQuestions.sort: *.key) -> (:$key, :$value) {
+        my $questionNameString = $lineIndent ~ "Question Number { $key + 1 }: ";
+        $outputString ~= $questionNameString;
+        #        $outputString ~= '.' x ($displayWidth - $questionNameString.chars - $resultLength);
+        $outputString ~= "$value wrong answers.\n";
     }
     
     return $outputString;

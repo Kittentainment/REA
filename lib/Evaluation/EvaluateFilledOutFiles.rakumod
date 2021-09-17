@@ -56,8 +56,12 @@ sub evaluateFilledOutFile(:$parsedMasterFile, EFParser :$parsedFilledOutFile) re
         @warnings.append(WarningInfo.new(warning => INTRO_MISMATCH));
     }
     
+    my Int @filledOutAnsersIndexedByMasterfile;
+    my Int @correctMasterAnswerIndexes;
+    
+    CHECK_EVERY_QA_COMBO_LOOP:
     for ^$parsedMasterFile.QACombos -> $QAComboIndex {
-        say "Comparing answer number {$QAComboIndex + 1}" if $debugging;
+        say "Comparing question number {$QAComboIndex + 1}" if $debugging;
         # If there is no question from the student file, some questions might have gone missing.
         unless ($parsedFilledOutFile.QACombos[$QAComboIndex]) {
             my Int $actualQuestionCount = $parsedFilledOutFile.QACombos.elems;
@@ -70,6 +74,7 @@ sub evaluateFilledOutFile(:$parsedMasterFile, EFParser :$parsedFilledOutFile) re
         my $masterQACombo = $parsedMasterFile.QACombos[$QAComboIndex];
         my $filledOutQACombo = $parsedFilledOutFile.QACombos[$QAComboIndex];
         
+        # Check if the question is the same, or at least similar (and warn if it is not the same)
         unless ($masterQACombo.question eq $filledOutQACombo.question) {
             if (normalizeAndCheckDistance($masterQACombo.question, $filledOutQACombo.question)) {
                 # The question at the same number looks very similar. We assume it's the same, but tell the examiner about it.
@@ -114,8 +119,8 @@ sub evaluateFilledOutFile(:$parsedMasterFile, EFParser :$parsedFilledOutFile) re
                 for ^@filledOutAnswerTexts -> $filledOutAnswerIndex {
                     my Str $filledOutAnswerText = @filledOutAnswerTexts[$filledOutAnswerIndex];
                     my Int $distance = dld(normalizeText($masterAnswerText), normalizeText($filledOutAnswerText));
+                    # ignore if it's not at least similar:
                     next unless (isGivenDistanceOK(:$distance, expectedText => $masterAnswerText));
-                    # ignore if it's not at least similar.
                     if (!$shortestDistance.defined || $shortestDistance > $distance) {
                         $shortestDistance = $distance;
                         $bestFoundAnswerIndex = $filledOutAnswerIndex;
@@ -151,6 +156,31 @@ sub evaluateFilledOutFile(:$parsedMasterFile, EFParser :$parsedFilledOutFile) re
                     && %masterToFilledOutMatcher{$correctAnswerText} eq $singleMarkedAnswerText) {
                 $score++;
             }
+    
+        }
+        
+        # Now for the statistics (Ex 4), mark which answer this file gave (with the corresponding Index of the
+        # master file, as the master file is the same for every file, but every filled out file has different answer indexes)
+        STATISTICS_GATHERING_LOOP:
+        for ^$masterQACombo.getAllAnswerTexts() -> $currMasterAnswerIndex {
+            # Mark the correct answer Index
+            my Str $currMasterAnswerText = $masterQACombo.getAllAnswerTexts()[$currMasterAnswerIndex];
+            if ($masterQACombo.markedAnswers[0] eq $currMasterAnswerText) {
+                # This is the Index of the correct answer. Mark it.
+                @correctMasterAnswerIndexes[$QAComboIndex] = $currMasterAnswerIndex;
+            }
+            # Mark the filled out answer Index
+            unless ($filledOutQACombo.markedAnswers.elems == 1) {
+                # If they didn't even try to fill out this answer, mark this question index as not filled out.
+                @filledOutAnsersIndexedByMasterfile[$QAComboIndex] = Nil;
+                last STATISTICS_GATHERING_LOOP;
+            }
+            if (%masterToFilledOutMatcher{$currMasterAnswerText}
+                    && %masterToFilledOutMatcher{$currMasterAnswerText} eq $filledOutQACombo.markedAnswers[0]) {
+                # This is the index of the master file answer, which we filled out in the filled out file.
+                @filledOutAnsersIndexedByMasterfile[$QAComboIndex] = $currMasterAnswerIndex;
+            }
+            
         }
         
         # Now find out all the unmatched filledOutAnswers
@@ -158,15 +188,16 @@ sub evaluateFilledOutFile(:$parsedMasterFile, EFParser :$parsedFilledOutFile) re
             next if grep $currentText, @matchedFilledOutAnswers;
             @unmatchedFilledOutAnswers.append($currentText);
         }
-        
-        
-        if (@unmatchedFilledOutAnswers || @unmatchedMasterAnswers) { # add a warning if we found any answers we couldn't match.
+
+        # Add a warning if we found any answers we couldn't match
+        if (@unmatchedFilledOutAnswers || @unmatchedMasterAnswers) {
             @warnings.append(WarningInfo.new(warning => ANSWER_MISMATCH_ERROR, questionNumber => $QAComboIndex,
                     expectedAnswerTexts => @unmatchedMasterAnswers, actualAnswerTexts => @unmatchedFilledOutAnswers));
         }
         
     }
-    return OkTestResult.new(:@warnings, :$score, maxScore => $parsedMasterFile.QACombos.elems, :$triedToAnswer, :$comments, :$fileName)
+    return OkTestResult.new(:@warnings, :$score, maxScore => $parsedMasterFile.QACombos.elems, :$triedToAnswer,
+            :$comments, :$fileName, :@filledOutAnsersIndexedByMasterfile, :@correctMasterAnswerIndexes)
 }
 
 
@@ -180,94 +211,5 @@ sub dieIfMasterFileError(EFParser :$parsedMasterFile) returns Bool {
         }
     };
 }
-
-
-
-
-
-
-############################################################
-
-#| Evaluates all Questions in both files, if they match exactly (task 1b).
-#| Old version of evaluateFilledOutFile. Kept for testing purposes.
-sub evaluateFilledOutFileExactly(:$parsedMasterFile, :$parsedFilledOutFile) returns TestResult {
-    my WarningInfo @warnings;
-    my Int $score = 0;
-    my Int $triedToAnswer = 0;
-    my Str $fileName = $parsedFilledOutFile.fileName;
-    my Str $comments = $parsedFilledOutFile.comments;
-    
-    # Warn if intro does not match exactly, as this could be a disadvantage to a student.
-    unless ($parsedMasterFile.intro eq $parsedFilledOutFile.intro) {
-        @warnings.append(WarningInfo.new(warning => INTRO_MISMATCH));
-    }
-    
-    
-    for ^$parsedMasterFile.QACombos -> $QAComboIndex {
-        # If there is no question from the student file, some questions might have gone missing.
-        unless ($parsedFilledOutFile.QACombos[$QAComboIndex]) {
-            my Int $actualQuestionCount = $parsedFilledOutFile.QACombos.elems;
-            my Int $expectedQuestionCount = $parsedMasterFile.QACombos.elems;
-            @warnings.append(WarningInfo.new(warning => QUESTION_COUNT_ERROR, questionNumber => $QAComboIndex,
-                    :$actualQuestionCount, :$expectedQuestionCount));
-            last;
-        }
-        
-        my $masterQACombo = $parsedMasterFile.QACombos[$QAComboIndex];
-        my $filledOutQACombo = $parsedFilledOutFile.QACombos[$QAComboIndex];
-        
-        # If the questions don't match, we can't evaluate it, as we can't guarantee it's the same question.
-        unless ($masterQACombo.question eq $filledOutQACombo.question) {
-            @warnings.append(WarningInfo.new(warning => QUESTION_MISMATCH_ERROR, questionNumber => $QAComboIndex));
-            next;
-        }
-        
-        # Check if answered correctly.
-        if ($filledOutQACombo.markedAnswers.elems == 1) {
-            $triedToAnswer++;
-            if ($masterQACombo.markedAnswers eq $filledOutQACombo.markedAnswers) {
-                $score++;
-            }
-        }
-        
-        # Check if any warnings need to be applied for this answer block.
-        my @filledOutAnswers = $filledOutQACombo.getAllAnswerTexts();
-        
-        my @masterAnswers = $masterQACombo.getAllAnswerTexts();
-        my @unmatchedFilledOutAnswers = ();
-        
-        FILLED_OUT_ANSWERS_LOOP:
-        while @filledOutAnswers.elems > 0 {
-            # take out the first Answer one after the other and check if the answer matches a master answer
-            my $filledOutAnswerText = @filledOutAnswers.pop();
-            
-            MASTER_ANSWERS_TO_COMPARE_TO:
-            for ^@masterAnswers -> $masterAnswerIndex {
-                if (@masterAnswers[$masterAnswerIndex] eq $filledOutAnswerText) {
-                    # found match
-                    @masterAnswers.splice($masterAnswerIndex, 1);
-                    #remove from MasterAnswers and end the loop for this $filledOutAnswerText
-                    next FILLED_OUT_ANSWERS_LOOP;
-                }
-            }
-            # We found no exact match for our $filledOutAnswerText:
-            @unmatchedFilledOutAnswers.append($filledOutAnswerText);
-        }
-        
-        # @masterAnswers now holds only the unmatched ones.
-        if (@unmatchedFilledOutAnswers || @masterAnswers) { #if any has elements
-            @warnings.append(WarningInfo.new(warning => ANSWER_MISMATCH_ERROR, questionNumber => $QAComboIndex,
-                    expectedAnswerTexts => @masterAnswers, actualAnswerTexts => @unmatchedFilledOutAnswers));
-        }
-        
-        # check if number of answers match
-        #for each answer in master
-        # check all answers for matching exactly
-        # return for each mismatch an answer mismatch error incl "expected answer text" question number
-    }
-    return OkTestResult.new(:@warnings, :$score, :$triedToAnswer, :$comments, :$fileName)
-}
-
-
 
 
