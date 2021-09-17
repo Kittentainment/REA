@@ -162,7 +162,7 @@ sub evaluateFilledOutFile(:$parsedMasterFile, EFParser :$parsedFilledOutFile) re
         # Now for the statistics (Ex 4), mark which answer this file gave (with the corresponding Index of the
         # master file, as the master file is the same for every file, but every filled out file has different answer indexes)
         STATISTICS_GATHERING_LOOP:
-        for ^$masterQACombo.getAllAnswerTexts() -> $currMasterAnswerIndex {
+        for ^($masterQACombo.getAllAnswerTexts()) -> $currMasterAnswerIndex {
             # Mark the correct answer Index
             my Str $currMasterAnswerText = $masterQACombo.getAllAnswerTexts()[$currMasterAnswerIndex];
             if ($masterQACombo.markedAnswers[0] eq $currMasterAnswerText) {
